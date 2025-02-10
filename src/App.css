@@ -1,4 +1,3 @@
-/* Modern styling for the SQL Query Executor */
 :root {
   --primary-color: #0066ff;
   --primary-hover: #0052cc;
@@ -9,52 +8,61 @@
   --success-color: #059669;
 }
 
-.app-container {
-  min-height: 100vh;
+/* Global Styles */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   background-color: var(--background-color);
   color: var(--text-color);
 }
 
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navigation */
 .navbar {
+  background-color: white;
+  padding: 1rem 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
-  background-color: white;
-  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .nav-brand {
   display: flex;
   align-items: center;
+  gap: 0.75rem;
   font-size: 1.25rem;
   font-weight: 600;
-  gap: 0.5rem;
+  color: var(--text-color);
 }
 
 .nav-icon {
-  font-size: 1.5rem;
+  color: var(--primary-color);
 }
 
 .nav-actions {
   display: flex;
   gap: 1rem;
-  align-items: center;
 }
 
 .nav-button {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 0.375rem;
-  background: none;
-  color: var(--text-color);
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.5rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
-}
-
-.nav-button:hover {
-  background-color: var(--background-color);
+  border: none;
+  font-size: 0.875rem;
 }
 
 .nav-button.primary {
@@ -66,17 +74,74 @@
   background-color: var(--primary-hover);
 }
 
-.main-content {
-  max-width: 1200px;
-  margin: 2rem auto;
-  padding: 0 2rem;
+.nav-button.outline {
+  border: 1px solid var(--border-color);
+  background-color: transparent;
+  color: var(--text-color);
 }
 
-.query-section {
-  background-color: white;
+.nav-button.outline:hover {
+  background-color: var(--background-color);
+}
+
+/* Landing Page */
+.landing-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, var(--primary-color), #00b4d8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  color: #4b5563;
+  margin-bottom: 2rem;
+}
+
+.cta-button {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+  font-weight: 500;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
   border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cta-button:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 4rem;
+}
+
+.feature-card {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
   margin-bottom: 2rem;
 }
 
@@ -89,13 +154,15 @@
 .query-input {
   width: 100%;
   height: 200px;
-  padding: 1rem;
+  padding: 1.5rem;
   border: 1px solid var(--border-color);
-  border-radius: 0.375rem;
+  border-radius: 0.75rem;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   font-size: 0.875rem;
-  line-height: 1.5;
+  line-height: 1.6;
   resize: vertical;
+  background-color: #f8fafc;
+  transition: all 0.2s;
 }
 
 .query-input:focus {
@@ -105,38 +172,43 @@
 }
 
 .execute-button {
-  align-self: flex-start;
+  align-self: flex-end;
   padding: 0.75rem 1.5rem;
   background-color: var(--primary-color);
   color: white;
   border: none;
-  border-radius: 0.375rem;
+  border-radius: 0.5rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .execute-button:hover:not(:disabled) {
   background-color: var(--primary-hover);
+  transform: translateY(-1px);
 }
 
-.execute-button.loading {
+.execute-button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
 }
 
 .executed-query {
   margin-top: 1.5rem;
-  padding: 1rem;
+  padding: 1.5rem;
   background-color: #f8fafc;
-  border-radius: 0.375rem;
+  border-radius: 0.75rem;
   border: 1px solid var(--border-color);
 }
 
 .executed-query h3 {
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.75rem 0;
   font-size: 0.875rem;
   color: #64748b;
+  font-weight: 500;
 }
 
 .executed-query pre {
@@ -149,27 +221,30 @@
 
 .error-message {
   margin-top: 1.5rem;
-  padding: 1rem;
+  padding: 1.5rem;
   background-color: #fef2f2;
   border: 1px solid #fecaca;
-  border-radius: 0.375rem;
+  border-radius: 0.75rem;
   color: var(--error-color);
 }
 
 .error-message h3 {
   margin: 0 0 0.5rem 0;
   font-size: 0.875rem;
+  font-weight: 500;
 }
 
 .error-message p {
   margin: 0;
+  line-height: 1.5;
 }
 
+/* Results Section */
 .results-section {
   background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
 }
 
 .results-header {
@@ -189,13 +264,15 @@
   padding: 0.5rem 1rem;
   background-color: #ecfdf5;
   color: var(--success-color);
-  border-radius: 0.375rem;
+  border-radius: 0.5rem;
   font-size: 0.875rem;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 }
 
 .results-table-wrapper {
   overflow-x: auto;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-color);
 }
 
 .results-table {
@@ -206,172 +283,63 @@
 
 .results-table th {
   background-color: #f8fafc;
-  padding: 0.75rem 1rem;
+  padding: 1rem;
   text-align: left;
   font-weight: 600;
   border-bottom: 2px solid var(--border-color);
+  white-space: nowrap;
 }
 
 .results-table td {
-  padding: 0.75rem 1rem;
+  padding: 1rem;
   border-bottom: 1px solid var(--border-color);
 }
 
-.results-table tr:hover {
+.results-table tbody tr:hover {
   background-color: #f8fafc;
 }
 
-@media (max-width: 768px) {
-  .navbar {
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
-  }
-
-  .nav-actions {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .main-content {
-    padding: 0 1rem;
-  }
-
-  .execution-time {
-    display: none;
-  }
-}
-
-
-/* Add these new styles to your existing CSS file */
-
+/* Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  backdrop-filter: blur(4px);
 }
 
 .modal-content {
   background-color: white;
-  padding: 2rem;
-  border-radius: 0.5rem;
+  padding: 2.5rem;
+  border-radius: 1rem;
   width: 90%;
   max-width: 400px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .modal-content h2 {
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 0.5rem 0;
   text-align: center;
   color: var(--text-color);
+  font-size: 1.5rem;
 }
 
-/* Update navbar styles */
-.navbar {
-  position: relative;
-  z-index: 100;
-}
-
-.nav-actions {
-  margin-left: auto;
-}
-
-/* Update form styles */
-.form-group {
-  margin-bottom: 1rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid var(--border-color);
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-}
-
-.form-group input:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
-}
-
-.login-error {
-  margin-bottom: 1rem;
-  padding: 0.75rem;
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 0.375rem;
-  color: var(--error-color);
-  font-size: 0.875rem;
-}
-
-.login-button {
-  width: 100%;
-  padding: 0.75rem;
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 0.375rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.login-button:hover:not(:disabled) {
-  background-color: var(--primary-hover);
-}
-
-.login-button:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-/* Modern styling for the SQL Query Executor with Auth */
-:root {
-  --primary-color: #0066ff;
-  --primary-hover: #0052cc;
-  --background-color: #f8f9fa;
-  --text-color: #1a1f36;
-  --border-color: #e5e7eb;
-  --error-color: #dc2626;
-  --success-color: #059669;
-}
-
-/* ... (Keep all previous styles from the last CSS artifact) ... */
-
-/* Add these new styles for login functionality */
-.login-container {
-  max-width: 400px;
-  margin: 4rem auto;
-  padding: 2rem;
-  background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.login-container h2 {
-  margin: 0 0 1.5rem 0;
+.modal-subtitle {
   text-align: center;
-  color: var(--text-color);
+  color: #4b5563;
+  margin: 0 0 2rem 0;
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.5rem;
 }
 
 .form-group {
@@ -387,10 +355,11 @@
 }
 
 .form-group input {
-  padding: 0.75rem;
+  padding: 0.75rem 1rem;
   border: 1px solid var(--border-color);
-  border-radius: 0.375rem;
+  border-radius: 0.5rem;
   font-size: 0.875rem;
+  transition: all 0.2s;
 }
 
 .form-group input:focus {
@@ -399,13 +368,23 @@
   box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
 }
 
+.login-error {
+  padding: 0.75rem 1rem;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 0.5rem;
+  color: var(--error-color);
+  font-size: 0.875rem;
+}
+
 .login-button {
-  padding: 0.75rem 1.5rem;
+  padding: 0.875rem;
   background-color: var(--primary-color);
   color: white;
   border: none;
-  border-radius: 0.375rem;
+  border-radius: 0.5rem;
   font-weight: 500;
+  font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -419,42 +398,383 @@
   cursor: not-allowed;
 }
 
-.login-error {
-  padding: 0.75rem;
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 0.375rem;
-  color: var(--error-color);
-  font-size: 0.875rem;
-}
+/* Responsive Design */
+/* Add these styles inside the existing @media (max-width: 768px) query */
 
-/* Update query input dimensions */
-.query-input {
-  width: 100%;
-  height: 150px; /* Reduced from 200px */
-  max-width: 800px; /* Added max-width */
-  margin: 0 auto;
-}
-
-/* Add responsive styles for login */
 @media (max-width: 768px) {
-  .login-container {
-    margin: 2rem 1rem;
+  /* Existing mobile styles... */
+
+  /* Enhanced Navigation for mobile */
+  .navbar {
+    padding: 0.75rem 1rem;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    box-sizing: border-box;
+  }
+
+  .nav-brand {
+    font-size: 1.125rem;
+  }
+
+  .nav-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  /* Adjust main content for fixed navbar */
+  .main-content {
+    margin-top: 4rem;
+  }
+
+  /* Better touch targets */
+  .execute-button {
+    padding: 1rem 1.5rem;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .nav-button,
+  .login-button,
+  .cta-button {
+    min-height: 44px; /* Minimum touch target size */
+  }
+
+  /* Improved form elements */
+  .form-group input {
+    padding: 0.875rem;
+    font-size: 1rem;
+  }
+
+  .query-input {
+    height: 150px; /* Shorter on mobile */
+    font-size: 1rem;
+    padding: 1rem;
+  }
+
+  /* Better table handling */
+  .results-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .results-table th,
+  .results-table td {
+    padding: 0.875rem;
+    min-width: 120px; /* Prevent too narrow columns */
+  }
+
+  /* Modal improvements */
+  .modal-content {
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    margin: 1rem;
+    padding: 1.25rem;
+  }
+
+  /* Feature cards optimization */
+  .feature-card {
     padding: 1.5rem;
+  }
+
+  .feature-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* Enhanced spacing for touch */
+  .results-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .execution-time {
+    width: 100%;
+    text-align: center;
+    display: block;
+  }
+
+  /* Hero section adjustments */
+  .hero {
+    padding: 2rem 1rem;
+  }
+
+  .hero h1 {
+    font-size: 1.75rem;
+    line-height: 1.3;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+    line-height: 1.5;
   }
 }
 
-.content-wrapper {
-  transition: filter 0.3s ease;
+/* Additional breakpoint for very small devices */
+@media (max-width: 380px) {
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+
+  .nav-brand {
+    font-size: 1rem;
+  }
+
+  .nav-icon {
+    display: none; /* Hide icon on very small screens */
+  }
+
+  .feature-card {
+    padding: 1rem;
+  }
+
+  .modal-content {
+    padding: 1rem;
+  }
 }
 
+/* Enable smooth scrolling on iOS */
+@supports (-webkit-overflow-scrolling: touch) {
+  .results-table-wrapper {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Prevent zoom on input focus for iOS */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  select,
+  textarea,
+  input {
+    font-size: 16px;
+  }
+}
+
+/* Blurred content */
 .content-wrapper.blurred {
   filter: blur(4px);
   pointer-events: none;
   user-select: none;
 }
 
-/* Remove if you have the existing login-prompt class */
-.login-prompt {
-  display: none;
+/* Transitions */
+.query-section,
+.results-section,
+.feature-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+  background-color: #f0f9ff;
+  color: var(--primary-color);
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.feature-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem 0;
+}
+
+.feature-card p {
+  color: #4b5563;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Workspace */
+.workspace {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+}
+
+.query-section {
+  background-color: white;
+  border-radius: 1
+}
+
+/* other page styles */
+/* Add near your other page styles */
+.page-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+}
+
+.page-title {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: var(--text-color);
+}
+
+/* Cohort Cards */
+.cohorts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.cohort-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s;
+}
+
+.cohort-card:hover {
+  transform: translateY(-4px);
+}
+
+.cohort-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.progress-badge {
+  background: #ecfdf5;
+  color: var(--success-color);
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+}
+
+.cohort-button {
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  margin-top: 1rem;
+  cursor: pointer;
+}
+
+/* Assignment Cards */
+.assignments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 2rem;
+}
+
+.assignment-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.assignment-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.difficulty-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.difficulty-badge.easy {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.difficulty-badge.medium {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.difficulty-badge.hard {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.query-preview {
+  background: #f8fafc;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 0.875rem;
+  margin: 1rem 0;
+  overflow-x: auto;
+}
+
+.assignment-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.assignment-button {
+  padding: 0.5rem 1rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .cohorts-grid,
+  .assignments-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .page-container {
+    padding: 0 1rem;
+    margin-top: 4rem;
+  }
+}
+
+/* tab styling */
+.nav-button.tab.active {
+  color: var(--primary-color);
+}
+
+.nav-button.tab.active::after {
+  transform: scaleX(1);
+}
+
+/* Add to your existing .nav-button.tab styles */
+.nav-button.tab {
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  margin: 0 0.5rem;
+}
+
+/* Adjust spacing for mobile */
+@media (max-width: 768px) {
+  .nav-actions {
+    gap: 0.5rem;
+  }
+  
+  .nav-button.tab {
+    margin: 0 0.25rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
 }

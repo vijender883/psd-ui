@@ -1,5 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
+import { Terminal, BookOpen, Users, Clock } from 'lucide-react';
+import CohortPage from './CohortPage';
+import AssignmentsPage from './AssignmentsPage';
+
+const FeatureCard = ({ icon: Icon, title, description }) => (
+  <div className="feature-card">
+    <div className="feature-icon">
+      <Icon size={24} />
+    </div>
+    <h3>{title}</h3>
+    <p>{description}</p>
+  </div>
+);
 
 const LoginModal = ({ isOpen, onClose, onLogin }) => {
   const [token, setToken] = useState('');
@@ -41,7 +54,8 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
-        <h2>Login Required</h2>
+        <h2>Welcome Back!</h2>
+        <p className="modal-subtitle">Enter your access token to continue learning</p>
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
             <label htmlFor="token">Access Token</label>
@@ -56,7 +70,7 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
           </div>
           {error && <div className="login-error">{error}</div>}
           <button type="submit" className="login-button" disabled={loading}>
-            {loading ? 'Verifying...' : 'Submit'}
+            {loading ? 'Verifying...' : 'Start Learning'}
           </button>
         </form>
       </div>
@@ -72,7 +86,7 @@ const App = () => {
   const [executedQuery, setExecutedQuery] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
-
+  const [activeTab, setActiveTab] = useState('sql');
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
@@ -80,22 +94,6 @@ const App = () => {
       setIsLoggedIn(true);
     }
   }, []);
-
-  useEffect(() => {
-    const handleClick = () => {
-      if (!isLoggedIn) {
-        setShowLoginModal(true);
-      }
-    };
-
-    if (!isLoggedIn) {
-      document.addEventListener('click', handleClick);
-    }
-
-    return () => {
-      document.removeEventListener('click', handleClick);
-    };
-  }, [isLoggedIn]);
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
@@ -109,7 +107,7 @@ const App = () => {
     if (e) {
       e.preventDefault();
     }
-    
+
     if (!isLoggedIn) {
       setShowLoginModal(true);
       return;
@@ -131,7 +129,7 @@ const App = () => {
       });
 
       const data = await response.json();
-      
+
       if (data.error) {
         setError(data.error);
         setResult(null);
@@ -143,9 +141,9 @@ const App = () => {
       setError('Failed to execute query');
       setResult(null);
     }
-    
+
     setLoading(false);
-  }, [isLoggedIn, query]); // Add dependencies here
+  }, [isLoggedIn, query]);
 
   useEffect(() => {
     const handleKeyPress = (e) => {
@@ -162,88 +160,155 @@ const App = () => {
     <div className="app-container">
       <nav className="navbar">
         <div className="nav-brand">
-          <span className="nav-icon">⚡</span>
-          Practical System Design
+          <Terminal className="nav-icon" />
+          <span>Practical System Design</span>
         </div>
         <div className="nav-actions">
-          {isLoggedIn && (
-            <button onClick={handleLogout} className="nav-button primary">
-              Logout
+          {!isLoggedIn ? (
+            <button onClick={() => setShowLoginModal(true)} className="nav-button primary">
+              Join Cohort
             </button>
+          ) : (
+            <>
+              <button
+                className={`nav-button tab ${activeTab === 'sql' ? 'active' : ''}`}
+                onClick={() => setActiveTab('sql')}
+              >
+                SQL Lab
+              </button>
+              <button
+                className={`nav-button tab ${activeTab === 'cohorts' ? 'active' : ''}`}
+                onClick={() => setActiveTab('cohorts')}
+              >
+                My Cohorts
+              </button>
+              <button
+                className={`nav-button tab ${activeTab === 'assignments' ? 'active' : ''}`}
+                onClick={() => setActiveTab('assignments')}
+              >
+                Assignments
+              </button>
+
+              <button onClick={handleLogout} className="nav-button outline">
+                Logout
+              </button>
+            </>
           )}
         </div>
       </nav>
 
       <main className="main-content">
-        <div className={`content-wrapper ${!isLoggedIn ? 'blurred' : ''}`}>
-          <div className="query-section">
-            <form onSubmit={handleSubmit} className="query-form">
-              <textarea
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Enter your SQL query here... (Ctrl + Enter to execute)"
-                className="query-input"
-              />
-              <button
-                type="submit"
-                disabled={loading}
-                className={`execute-button ${loading ? 'loading' : ''}`}
-              >
-                {loading ? 'Executing...' : 'Execute Query'}
+        {!isLoggedIn ? (
+          <div className="landing-section">
+            <div className="hero">
+              <h1>Master SQL and System Design</h1>
+              <p className="hero-subtitle">Learn practical database skills through hands-on exercises and real-world scenarios</p>
+              <button onClick={() => setShowLoginModal(true)} className="cta-button">
+                Start Learning Now
               </button>
-            </form>
+            </div>
 
-
-            {executedQuery && (
-              <div className="executed-query">
-                <h3>Executed Query</h3>
-                <pre>{executedQuery}</pre>
-              </div>
-            )}
-
-            {error && (
-              <div className="error-message">
-                <h3>Error</h3>
-                <p>{error}</p>
-              </div>
-            )}
-
+            <div className="features-grid">
+              <FeatureCard
+                icon={BookOpen}
+                title="Practical Learning"
+                description="Learn through hands-on exercises and real-world scenarios"
+              />
+              <FeatureCard
+                icon={Users}
+                title="Cohort-Based"
+                description="Learn alongside peers and get personalized feedback"
+              />
+              <FeatureCard
+                icon={Terminal}
+                title="Interactive SQL"
+                description="Write and execute SQL queries in real-time"
+              />
+              <FeatureCard
+                icon={Clock}
+                title="Self-Paced"
+                description="Learn at your own pace with structured modules"
+              />
+            </div>
           </div>
+        ) : (
 
-          {result && (
-            <div className="results-section">
-              <div className="results-header">
-                <h2>Query Results</h2>
-                {result.executionTime && (
-                  <div className="execution-time">
-                    Execution Time: {result.executionTime}
+          <div className={`workspace ${!isLoggedIn ? 'blurred' : ''}`}>
+            {activeTab === 'sql' && (
+              <div className="workspace">
+                <div className="query-section">
+                  <form onSubmit={handleSubmit} className="query-form">
+                    <textarea
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder="Enter your SQL query here... (Ctrl + Enter to execute)"
+                      className="query-input"
+                    />
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className={`execute-button ${loading ? 'loading' : ''}`}
+                    >
+                      {loading ? 'Executing...' : 'Execute Query'}
+                    </button>
+                  </form>
+
+                  {executedQuery && (
+                    <div className="executed-query">
+                      <h3>Executed Query</h3>
+                      <pre>{executedQuery}</pre>
+                    </div>
+                  )}
+
+                  {error && (
+                    <div className="error-message">
+                      <h3>Error</h3>
+                      <p>{error}</p>
+                    </div>
+                  )}
+                </div>
+
+                {result && (
+                  <div className="results-section">
+                    <div className="results-header">
+                      <h2>Query Results</h2>
+                      {result.executionTime && (
+                        <div className="execution-time">
+                          Execution Time: {result.executionTime}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="results-table-wrapper">
+                      <table className="results-table">
+                        <thead>
+                          <tr>
+                            {result.columns?.map((column, i) => (
+                              <th key={i}>{column}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {result.rows?.map((row, i) => (
+                            <tr key={i}>
+                              {Object.values(row).map((value, j) => (
+                                <td key={j}>{value}</td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 )}
-              </div>
 
-              <div className="results-table-wrapper">
-                <table className="results-table">
-                  <thead>
-                    <tr>
-                      {result.columns?.map((column, i) => (
-                        <th key={i}>{column}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {result.rows?.map((row, i) => (
-                      <tr key={i}>
-                        {Object.values(row).map((value, j) => (
-                          <td key={j}>{value}</td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+            {activeTab === 'cohorts' && <CohortPage />}
+            {activeTab === 'assignments' && <AssignmentsPage />}
+
+          </div>
+        )}
       </main>
 
       <LoginModal
