@@ -163,7 +163,7 @@ const App = () => {
       <nav className="navbar">
         <div className="nav-brand">
           <span className="nav-icon">⚡</span>
-          SQL Query Executor
+          Practical System Design
         </div>
         <div className="nav-actions">
           {isLoggedIn && (
