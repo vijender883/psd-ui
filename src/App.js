@@ -4,6 +4,7 @@ import './App.css';
 import { Terminal, BookOpen, Users, Clock } from 'lucide-react';
 import CohortPage from './CohortPage';
 import AssignmentsPage from './AssignmentsPage';
+import IndexingLab from './IndexingLab';
 
 // Feature Card Component
 const FeatureCard = ({ icon: Icon, title, description }) => (
@@ -142,40 +143,40 @@ const SQLLab = () => {
 
     document.addEventListener('keydown', handleKeyPress);
     return () => document.removeEventListener('keydown', handleKeyPress);
-  },[query, handleSubmit]);
+  }, [query, handleSubmit]);
 
   return (
     <div className="workspace">
       {/* <div className="query-section"> */}
-        <form onSubmit={handleSubmit} className="query-form">
-          <textarea
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Enter your SQL query here... (Ctrl + Enter to execute)"
-            className="query-input"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className={`execute-button ${loading ? 'loading' : ''}`}
-          >
-            {loading ? 'Executing...' : 'Execute Query'}
-          </button>
-        </form>
+      <form onSubmit={handleSubmit} className="query-form">
+        <textarea
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Enter your SQL query here... (Ctrl + Enter to execute)"
+          className="query-input"
+        />
+        <button
+          type="submit"
+          disabled={loading}
+          className={`execute-button ${loading ? 'loading' : ''}`}
+        >
+          {loading ? 'Executing...' : 'Execute Query'}
+        </button>
+      </form>
 
-        {executedQuery && (
-          <div className="executed-query">
-            <h3>Executed Query</h3>
-            <pre>{executedQuery}</pre>
-          </div>
-        )}
+      {executedQuery && (
+        <div className="executed-query">
+          <h3>Executed Query</h3>
+          <pre>{executedQuery}</pre>
+        </div>
+      )}
 
-        {error && (
-          <div className="error-message">
-            <h3>Error</h3>
-            <p>{error}</p>
-          </div>
-        )}
+      {error && (
+        <div className="error-message">
+          <h3>Error</h3>
+          <p>{error}</p>
+        </div>
+      )}
       {/* </div> */}
 
       {result && (
@@ -302,6 +303,12 @@ const App = () => {
           ) : (
             <>
               <Link
+                to="/indexinglab"
+                className={`nav-button tab ${locationhook.pathname === '/indexinglab' ? 'active' : ''}`}
+              >
+                IndexingLab
+              </Link>
+              <Link
                 to="/sql"
                 className={`nav-button tab ${locationhook.pathname === '/sql' ? 'active' : ''}`}
               >
@@ -334,6 +341,14 @@ const App = () => {
               <LandingPage onLoginClick={() => setShowLoginModal(true)} /> :
               <Navigate to="/sql" replace />
           } />
+          <Route
+            path="/indexinglab"
+            element={
+              <ProtectedRoute>
+                <IndexingLab />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/sql"
             element={
