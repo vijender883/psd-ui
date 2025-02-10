@@ -1,23 +1,131 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import './App.css';
 
-function App() {
+const LoginModal = ({ isOpen, onClose, onLogin }) => {
+  const [token, setToken] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/verify-token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token }),
+      });
+
+      const data = await response.json();
+
+      if (data.valid) {
+        localStorage.setItem('authToken', token);
+        onLogin();
+        onClose();
+      } else {
+        setError('Invalid token');
+      }
+    } catch (err) {
+      setError('Failed to verify token');
+    }
+
+    setLoading(false);
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={e => e.stopPropagation()}>
+        <h2>Login Required</h2>
+        <form onSubmit={handleSubmit} className="login-form">
+          <div className="form-group">
+            <label htmlFor="token">Access Token</label>
+            <input
+              type="password"
+              id="token"
+              value={token}
+              onChange={(e) => setToken(e.target.value)}
+              placeholder="Enter your access token"
+              required
+            />
+          </div>
+          {error && <div className="login-error">{error}</div>}
+          <button type="submit" className="login-button" disabled={loading}>
+            {loading ? 'Verifying...' : 'Submit'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+const App = () => {
   const [query, setQuery] = useState('');
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [executedQuery, setExecutedQuery] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleClick = () => {
+      if (!isLoggedIn) {
+        setShowLoginModal(true);
+      }
+    };
+
+    if (!isLoggedIn) {
+      document.addEventListener('click', handleClick);
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClick);
+    };
+  }, [isLoggedIn]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    setIsLoggedIn(false);
+    setResult(null);
+    setExecutedQuery(null);
+    setQuery('');
+  };
+
+  const handleSubmit = useCallback(async (e) => {
+    if (e) {
+      e.preventDefault();
+    }
+    
+    if (!isLoggedIn) {
+      setShowLoginModal(true);
+      return;
+    }
+
     setLoading(true);
     setError(null);
-    setExecutedQuery(query); // Store the executed query
+    setExecutedQuery(query);
 
     try {
+      const token = localStorage.getItem('authToken');
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/execute`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ query }),
       });
@@ -37,141 +145,114 @@ function App() {
     }
     
     setLoading(false);
-  };
+  }, [isLoggedIn, query]); // Add dependencies here
+
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && query.trim()) {
+        handleSubmit();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyPress);
+    return () => document.removeEventListener('keydown', handleKeyPress);
+  }, [query, handleSubmit]);
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h1 style={{ marginBottom: '20px' }}>SQL Query Executor</h1>
-      
-      <form onSubmit={handleSubmit}>
-        <textarea
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Enter your SQL query here..."
-          style={{
-            width: '100%',
-            height: '150px',
-            padding: '10px',
-            marginBottom: '10px',
-            fontFamily: 'monospace',
-            backgroundColor: '#f8f9fa',
-            border: '1px solid #dee2e6',
-            borderRadius: '4px'
-          }}
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            padding: '10px 20px',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: loading ? 'not-allowed' : 'pointer',
-            opacity: loading ? 0.7 : 1
-          }}
-        >
-          {loading ? 'Executing...' : 'Execute Query'}
-        </button>
-      </form>
-
-      {executedQuery && (
-        <div style={{ 
-          marginTop: '20px',
-          padding: '15px',
-          backgroundColor: '#e8f4ff',
-          borderRadius: '4px',
-          border: '1px solid #b3d7ff'
-        }}>
-          <h3 style={{ marginTop: 0, marginBottom: '10px', color: '#0056b3' }}>Executed Query:</h3>
-          <pre style={{ 
-            margin: 0,
-            whiteSpace: 'pre-wrap',
-            wordWrap: 'break-word',
-            fontFamily: 'monospace'
-          }}>
-            {executedQuery}
-          </pre>
+    <div className="app-container">
+      <nav className="navbar">
+        <div className="nav-brand">
+          <span className="nav-icon">⚡</span>
+          SQL Query Executor
         </div>
-      )}
-
-      {error && (
-        <div style={{
-          marginTop: '20px',
-          padding: '15px',
-          backgroundColor: '#ffebee',
-          color: '#c62828',
-          borderRadius: '4px',
-          border: '1px solid #ffcdd2'
-        }}>
-          <h3 style={{ marginTop: 0, marginBottom: '10px' }}>Error:</h3>
-          {error}
+        <div className="nav-actions">
+          {isLoggedIn && (
+            <button onClick={handleLogout} className="nav-button primary">
+              Logout
+            </button>
+          )}
         </div>
-      )}
+      </nav>
 
-      {result && (
-        <div style={{ marginTop: '20px' }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '20px'
-          }}>
-            <h2 style={{ margin: 0 }}>Query Results</h2>
-            {result.executionTime && (
-              <div style={{
-                backgroundColor: '#e8f5e9',
-                padding: '8px 16px',
-                borderRadius: '4px',
-                color: '#2e7d32',
-                fontFamily: 'monospace'
-              }}>
-                Execution Time: {result.executionTime}
+      <main className="main-content">
+        <div className={`content-wrapper ${!isLoggedIn ? 'blurred' : ''}`}>
+          <div className="query-section">
+            <form onSubmit={handleSubmit} className="query-form">
+              <textarea
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Enter your SQL query here... (Ctrl + Enter to execute)"
+                className="query-input"
+              />
+              <button
+                type="submit"
+                disabled={loading}
+                className={`execute-button ${loading ? 'loading' : ''}`}
+              >
+                {loading ? 'Executing...' : 'Execute Query'}
+              </button>
+            </form>
+
+
+            {executedQuery && (
+              <div className="executed-query">
+                <h3>Executed Query</h3>
+                <pre>{executedQuery}</pre>
               </div>
             )}
+
+            {error && (
+              <div className="error-message">
+                <h3>Error</h3>
+                <p>{error}</p>
+              </div>
+            )}
+
           </div>
-          
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              marginTop: '10px'
-            }}>
-              <thead>
-                <tr>
-                  {result.columns?.map((column, i) => (
-                    <th key={i} style={{
-                      padding: '10px',
-                      backgroundColor: '#f8f9fa',
-                      borderBottom: '2px solid #dee2e6',
-                      textAlign: 'left'
-                    }}>
-                      {column}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {result.rows?.map((row, i) => (
-                  <tr key={i}>
-                    {Object.values(row).map((value, j) => (
-                      <td key={j} style={{
-                        padding: '10px',
-                        borderBottom: '1px solid #dee2e6'
-                      }}>
-                        {value}
-                      </td>
+
+          {result && (
+            <div className="results-section">
+              <div className="results-header">
+                <h2>Query Results</h2>
+                {result.executionTime && (
+                  <div className="execution-time">
+                    Execution Time: {result.executionTime}
+                  </div>
+                )}
+              </div>
+
+              <div className="results-table-wrapper">
+                <table className="results-table">
+                  <thead>
+                    <tr>
+                      {result.columns?.map((column, i) => (
+                        <th key={i}>{column}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {result.rows?.map((row, i) => (
+                      <tr key={i}>
+                        {Object.values(row).map((value, j) => (
+                          <td key={j}>{value}</td>
+                        ))}
+                      </tr>
                     ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
-      )}
+      </main>
+
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onLogin={() => setIsLoggedIn(true)}
+      />
     </div>
   );
-}
+};
 
 export default App;

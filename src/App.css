@@ -1,38 +1,460 @@
-.App {
-  text-align: center;
+/* Modern styling for the SQL Query Executor */
+:root {
+  --primary-color: #0066ff;
+  --primary-hover: #0052cc;
+  --background-color: #f8f9fa;
+  --text-color: #1a1f36;
+  --border-color: #e5e7eb;
+  --error-color: #dc2626;
+  --success-color: #059669;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+.app-container {
   min-height: 100vh;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.navbar {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  padding: 1rem 2rem;
+  background-color: white;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  gap: 0.5rem;
+}
+
+.nav-icon {
+  font-size: 1.5rem;
+}
+
+.nav-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.nav-button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.375rem;
+  background: none;
+  color: var(--text-color);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nav-button:hover {
+  background-color: var(--background-color);
+}
+
+.nav-button.primary {
+  background-color: var(--primary-color);
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.nav-button.primary:hover {
+  background-color: var(--primary-hover);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.main-content {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+}
+
+.query-section {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.query-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.query-input {
+  width: 100%;
+  height: 200px;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.query-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+}
+
+.execute-button {
+  align-self: flex-start;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.execute-button:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+}
+
+.execute-button.loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.executed-query {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: #f8fafc;
+  border-radius: 0.375rem;
+  border: 1px solid var(--border-color);
+}
+
+.executed-query h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.executed-query pre {
+  margin: 0;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.error-message {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 0.375rem;
+  color: var(--error-color);
+}
+
+.error-message h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+}
+
+.error-message p {
+  margin: 0;
+}
+
+.results-section {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+}
+
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.results-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.execution-time {
+  padding: 0.5rem 1rem;
+  background-color: #ecfdf5;
+  color: var(--success-color);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.results-table-wrapper {
+  overflow-x: auto;
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.results-table th {
+  background-color: #f8fafc;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.results-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.results-table tr:hover {
+  background-color: #f8fafc;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
   }
-  to {
-    transform: rotate(360deg);
+
+  .nav-actions {
+    width: 100%;
+    justify-content: center;
   }
+
+  .main-content {
+    padding: 0 1rem;
+  }
+
+  .execution-time {
+    display: none;
+  }
+}
+
+
+/* Add these new styles to your existing CSS file */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content h2 {
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+  color: var(--text-color);
+}
+
+/* Update navbar styles */
+.navbar {
+  position: relative;
+  z-index: 100;
+}
+
+.nav-actions {
+  margin-left: auto;
+}
+
+/* Update form styles */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+}
+
+.login-error {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 0.375rem;
+  color: var(--error-color);
+  font-size: 0.875rem;
+}
+
+.login-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.login-button:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+}
+
+.login-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Modern styling for the SQL Query Executor with Auth */
+:root {
+  --primary-color: #0066ff;
+  --primary-hover: #0052cc;
+  --background-color: #f8f9fa;
+  --text-color: #1a1f36;
+  --border-color: #e5e7eb;
+  --error-color: #dc2626;
+  --success-color: #059669;
+}
+
+/* ... (Keep all previous styles from the last CSS artifact) ... */
+
+/* Add these new styles for login functionality */
+.login-container {
+  max-width: 400px;
+  margin: 4rem auto;
+  padding: 2rem;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.login-container h2 {
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+  color: var(--text-color);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.form-group input {
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+}
+
+.login-button {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.login-button:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+}
+
+.login-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.login-error {
+  padding: 0.75rem;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 0.375rem;
+  color: var(--error-color);
+  font-size: 0.875rem;
+}
+
+/* Update query input dimensions */
+.query-input {
+  width: 100%;
+  height: 150px; /* Reduced from 200px */
+  max-width: 800px; /* Added max-width */
+  margin: 0 auto;
+}
+
+/* Add responsive styles for login */
+@media (max-width: 768px) {
+  .login-container {
+    margin: 2rem 1rem;
+    padding: 1.5rem;
+  }
+}
+
+.content-wrapper {
+  transition: filter 0.3s ease;
+}
+
+.content-wrapper.blurred {
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Remove if you have the existing login-prompt class */
+.login-prompt {
+  display: none;
 }
