@@ -1,8 +1,26 @@
-// FirstNF.js
 import React from 'react';
 
 const FirstNF = () => {
-  // Define the normalized tables
+  // Added menu_items table
+  const menu_items = [
+    { item_id: "I001", name: "Pizza Margherita", category: "Pizza", 
+      description: "Fresh tomatoes, mozzarella, and basil", 
+      base_price: 15.00, is_available: true },
+    { item_id: "I002", name: "Coca Cola", category: "Beverages", 
+      description: "330ml can", 
+      base_price: 2.00, is_available: true },
+    { item_id: "I003", name: "Pasta Carbonara", category: "Pasta", 
+      description: "Creamy sauce with pancetta and parmesan", 
+      base_price: 18.00, is_available: true }
+  ];
+
+  const servers = [
+    { server_id: "S001", name: "Alice Johnson", hire_date: "2024-01-15", 
+      phone: "555-777-8888", email: "alice@restaurant.com" },
+    { server_id: "S002", name: "Bob Wilson", hire_date: "2024-01-20", 
+      phone: "555-777-9999", email: "bob@restaurant.com" }
+  ];
+
   const customers = [
     { customer_id: "C001", name: "John Doe", address_street: "123 Main St", 
       address_city: "City", address_state: "State", address_zip: "12345" },
@@ -33,11 +51,11 @@ const FirstNF = () => {
 
   const order_items = [
     { order_id: "ORD001", item_id: "I001", quantity: 2, unit_price: 15.00, 
-      customization: "Extra cheese", item_name: "Pizza Margherita" },
+      customization: "Extra cheese" },
     { order_id: "ORD001", item_id: "I002", quantity: 3, unit_price: 2.00, 
-      customization: null, item_name: "Coca Cola" },
+      customization: null },
     { order_id: "ORD002", item_id: "I003", quantity: 1, unit_price: 18.00, 
-      customization: "Light sauce", item_name: "Pasta Carbonara" }
+      customization: "Light sauce" }
   ];
 
   const order_payments = [
@@ -67,8 +85,62 @@ const FirstNF = () => {
         <ul>
           <li>🔑 - Primary Key</li>
           <li>🔗 - Foreign Key</li>
-          <li>🔐 - Composite Primary Key</li>
+          <li>🔐 - Composite Primary Key (both parts required for uniqueness)</li>
         </ul>
+      </div>
+
+      <h4>Menu Items Table</h4>
+      <div className="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>🔑 Item ID</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Description</th>
+              <th>Base Price</th>
+              <th>Is Available</th>
+            </tr>
+          </thead>
+          <tbody>
+            {menu_items.map((item, index) => (
+              <tr key={index}>
+                <td>{item.item_id}</td>
+                <td>{item.name}</td>
+                <td>{item.category}</td>
+                <td>{item.description}</td>
+                <td>${item.base_price.toFixed(2)}</td>
+                <td>{item.is_available ? 'Yes' : 'No'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Servers Table</h4>
+      <div className="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>🔑 Server ID</th>
+              <th>Name</th>
+              <th>Hire Date</th>
+              <th>Phone</th>
+              <th>Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            {servers.map((server, index) => (
+              <tr key={index}>
+                <td>{server.server_id}</td>
+                <td>{server.name}</td>
+                <td>{server.hire_date}</td>
+                <td>{server.phone}</td>
+                <td>{server.email}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       <h4>Customers Table</h4>
@@ -104,7 +176,7 @@ const FirstNF = () => {
         <table>
           <thead>
             <tr>
-              <th>🔐 Phone ID</th>
+              <th>🔑 Phone ID</th>
               <th>🔗 Customer ID</th>
               <th>Phone Number</th>
               <th>Phone Type</th>
@@ -117,6 +189,30 @@ const FirstNF = () => {
                 <td>{phone.customer_id}</td>
                 <td>{phone.phone_number}</td>
                 <td>{phone.phone_type}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Customer Emails Table</h4>
+      <div className="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>🔑 Email ID</th>
+              <th>🔗 Customer ID</th>
+              <th>Email</th>
+              <th>Email Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            {customer_emails.map((email, index) => (
+              <tr key={index}>
+                <td>{email.email_id}</td>
+                <td>{email.customer_id}</td>
+                <td>{email.email}</td>
+                <td>{email.email_type}</td>
               </tr>
             ))}
           </tbody>
@@ -156,9 +252,8 @@ const FirstNF = () => {
         <table>
           <thead>
             <tr>
-              <th>🔗 Order ID</th>
-              <th>🔗 Item ID</th>
-              <th>Item Name</th>
+              <th>🔐 Order ID</th>
+              <th>🔐 Item ID</th>
               <th>Quantity</th>
               <th>Unit Price</th>
               <th>Customization</th>
@@ -169,7 +264,6 @@ const FirstNF = () => {
               <tr key={index}>
                 <td>{item.order_id}</td>
                 <td>{item.item_id}</td>
-                <td>{item.item_name}</td>
                 <td>{item.quantity}</td>
                 <td>${item.unit_price.toFixed(2)}</td>
                 <td>{item.customization || '-'}</td>
@@ -179,7 +273,41 @@ const FirstNF = () => {
         </table>
       </div>
 
+      <h4>Order Payments Table</h4>
+      <div className="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>🔑 Payment ID</th>
+              <th>🔗 Order ID</th>
+              <th>Payment Method</th>
+              <th>Card Last Four</th>
+              <th>Amount</th>
+              <th>Payment Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {order_payments.map((payment, index) => (
+              <tr key={index}>
+                <td>{payment.payment_id}</td>
+                <td>{payment.order_id}</td>
+                <td>{payment.payment_method}</td>
+                <td>{payment.card_last_four || '-'}</td>
+                <td>${payment.amount.toFixed(2)}</td>
+                <td>{payment.payment_date}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
       <style jsx>{`
+        .description {
+          margin-bottom: 20px;
+          padding: 15px;
+          background: #f8f9fa;
+          border-radius: 5px;
+        }
         .legend {
           margin: 20px 0;
           padding: 15px;
@@ -195,10 +323,30 @@ const FirstNF = () => {
         }
         .table-container {
           margin-bottom: 30px;
+          overflow-x: auto;
         }
         h4 {
           margin-top: 20px;
           color: #333;
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-bottom: 10px;
+        }
+        th, td {
+          border: 1px solid #ddd;
+          padding: 8px;
+          text-align: left;
+        }
+        th {
+          background-color: #f5f5f5;
+        }
+        tr:nth-child(even) {
+          background-color: #f9f9f9;
+        }
+        tr:hover {
+          background-color: #f5f5f5;
         }
       `}</style>
     </div>
