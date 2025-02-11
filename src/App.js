@@ -5,6 +5,8 @@ import { Terminal, BookOpen, Users, Clock } from 'lucide-react';
 import CohortPage from './CohortPage';
 import AssignmentsPage from './AssignmentsPage';
 import IndexingLab from './IndexingLab';
+import NormalizationLab from './NormalizationLab/NormalizationLab';
+import './NormalizationLab/NormalizationLab.css';
 
 // Feature Card Component
 const FeatureCard = ({ icon: Icon, title, description }) => (
@@ -303,6 +305,13 @@ const App = () => {
           ) : (
             <>
               <Link
+                to="/normalization"
+                className={`nav-button tab ${locationhook.pathname === '/normalization' ? 'active' : ''}`}
+              >
+                Normalization Lab
+              </Link>
+
+              <Link
                 to="/indexinglab"
                 className={`nav-button tab ${locationhook.pathname === '/indexinglab' ? 'active' : ''}`}
               >
@@ -341,6 +350,15 @@ const App = () => {
               <LandingPage onLoginClick={() => setShowLoginModal(true)} /> :
               <Navigate to="/sql" replace />
           } />
+          <Route
+            path="/normalization"
+            element={
+              <ProtectedRoute>
+                <NormalizationLab />
+                <SQLLab/>
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/indexinglab"
             element={

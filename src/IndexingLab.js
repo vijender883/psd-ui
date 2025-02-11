@@ -19,6 +19,7 @@ const IndexingLab = () => {
     setError(null);
     setExecutedQuery(query);
 
+
     try {
       const token = localStorage.getItem('authToken');
       if (!token) {
@@ -52,6 +53,15 @@ const IndexingLab = () => {
     setLoading(false);
   }, [query, navigate]);
 
+  const setUnindexedQuery = () => {
+    setQuery("SELECT * FROM products_not_indexed WHERE name LIKE 'Smartphone %';");
+  };
+
+  const setIndexedQuery = () => {
+    setQuery("SELECT * FROM products_indexed WHERE name LIKE 'Smartphone %';");
+  };
+
+
   useEffect(() => {
     const handleKeyPress = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && query.trim()) {
@@ -74,20 +84,22 @@ const IndexingLab = () => {
           className="query-input"
         />
 
-        <button 
-          disabled={loading} 
-          className={`execute-button ${loading ? 'loading' : ''}`}
-          onClick={() => setQuery("SELECT * FROM products_not_indexed WHERE name LIKE 'Smartphone %';")}
-          >{loading ? 'Executing...' : 'Run Query on Unindexed Table'}
+        <button
+          type="button"
+          className="execute-button"
+          onClick={setUnindexedQuery}
+        >
+          Load Unindexed Query
         </button>
 
         <button
-          disabled={loading}
-          className={`execute-button ${loading ? 'loading' : ''}`}
-          onClick={() => setQuery("SELECT * FROM products_indexed WHERE name LIKE 'Smartphone %';")}
-          >{loading ? 'Executing...' : 'Run Query on Indexed Table'}
+          type="button"
+          className="execute-button"
+          onClick={setIndexedQuery}
+        >
+          Load Indexed Query
         </button>
-        
+
         <button
           type="submit"
           disabled={loading}
