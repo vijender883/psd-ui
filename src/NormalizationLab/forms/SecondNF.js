@@ -1,61 +1,50 @@
-// SecondNF.js
 import React from 'react';
 
 const SecondNF = () => {
   // Example of a table that would violate 2NF
   const violatingTable = {
-    name: "Order_Items_NonCompliant",
-    description: "Violates 2NF because item details depend only on Item ID, not the full key",
+    name: "Orders_NonCompliant",
+    description: "Violates 2NF because product details depend only on Product ID, not the full key",
     data: [
-      { order_id: "ORD001", item_id: "I001", quantity: 2, item_name: "Pizza Margherita", 
-        item_category: "Pizza", base_price: 15.00 },
-      { order_id: "ORD002", item_id: "I001", quantity: 1, item_name: "Pizza Margherita", 
-        item_category: "Pizza", base_price: 15.00 }
+      { order_id: 1, customer_id: 1, product_id: "P1", quantity: 1, 
+        product_name: "Laptop", product_price: 1000 },
+      { order_id: 2, customer_id: 1, product_id: "P1", quantity: 1, 
+        product_name: "Laptop", product_price: 1000 }
     ]
   };
 
   // 2NF Compliant Tables
-  const menu_items = [
-    { item_id: "I001", name: "Pizza Margherita", category_id: "CAT1", 
-      description: "Fresh tomatoes, mozzarella, basil", base_price: 15.00 },
-    { item_id: "I002", name: "Coca Cola", category_id: "CAT2", 
-      description: "330ml can", base_price: 2.00 },
-    { item_id: "I003", name: "Pasta Carbonara", category_id: "CAT3", 
-      description: "Creamy pasta with bacon", base_price: 18.00 }
+  const customers = [
+    { customer_id: 1, customer_name: "John Smith" }
   ];
 
-  const categories = [
-    { category_id: "CAT1", name: "Pizza", kitchen_section: "Hot Kitchen" },
-    { category_id: "CAT2", name: "Beverages", kitchen_section: "Cold Station" },
-    { category_id: "CAT3", name: "Pasta", kitchen_section: "Hot Kitchen" }
+  const phone_numbers = [
+    { customer_id: 1, phone_number: "555-0123" },
+    { customer_id: 1, phone_number: "555-0124" },
+    { customer_id: 1, phone_number: "555-0125" }
+  ];
+
+  const addresses = [
+    { customer_id: 1, street_address: "123 Main St", city: "New York" },
+    { customer_id: 1, street_address: "456 Park Ave", city: "Boston" }
+  ];
+
+  const products = [
+    { product_id: "P1", product_name: "Laptop", unit_price: 1000 },
+    { product_id: "P2", product_name: "Mouse", unit_price: 20 },
+    { product_id: "P3", product_name: "Keyboard", unit_price: 50 }
   ];
 
   const orders = [
-    { order_id: "ORD001", customer_id: "C001", server_id: "S001", 
-      order_date: "2024-02-11", order_time: "14:30", status: "Completed" },
-    { order_id: "ORD002", customer_id: "C002", server_id: "S001", 
-      order_date: "2024-02-11", order_time: "18:45", status: "In Progress" }
+    { order_id: 1, customer_id: 1 },
+    { order_id: 2, customer_id: 1 },
+    { order_id: 3, customer_id: 1 }
   ];
 
-  const order_items = [
-    { order_id: "ORD001", item_id: "I001", quantity: 2, price_at_time: 15.00, 
-      special_instructions: "Extra cheese" },
-    { order_id: "ORD001", item_id: "I002", quantity: 3, price_at_time: 2.00, 
-      special_instructions: null },
-    { order_id: "ORD002", item_id: "I001", quantity: 1, price_at_time: 15.00, 
-      special_instructions: "Well done" }
-  ];
-
-  const servers = [
-    { server_id: "S001", name: "Alice Johnson", hire_date: "2024-01-15" }
-  ];
-
-  const server_sections = [
-    { server_id: "S001", section_id: "SEC1", assignment_date: "2024-02-11" }
-  ];
-
-  const sections = [
-    { section_id: "SEC1", name: "Main Dining", capacity: 50 }
+  const order_details = [
+    { order_id: 1, product_id: "P1", quantity: 1 },
+    { order_id: 2, product_id: "P2", quantity: 2 },
+    { order_id: 3, product_id: "P3", quantity: 1 }
   ];
 
   return (
@@ -83,27 +72,27 @@ const SecondNF = () => {
       <div className="example-violation">
         <h4>Example of 2NF Violation</h4>
         <div className="table-container">
-          <p className="violation-note">This structure violates 2NF because item details depend only on Item ID, not the full composite key (Order ID, Item ID):</p>
+          <p className="violation-note">This structure violates 2NF because product details depend only on Product ID, not the full composite key:</p>
           <table>
             <thead>
               <tr>
                 <th>🔐 Order ID</th>
-                <th>🔐 Item ID</th>
+                <th>🔗 Customer ID</th>
+                <th>🔐 Product ID</th>
                 <th>Quantity</th>
-                <th>📦 Item Name</th>
-                <th>📦 Item Category</th>
-                <th>📦 Base Price</th>
+                <th>📦 Product Name</th>
+                <th>📦 Product Price</th>
               </tr>
             </thead>
             <tbody>
               {violatingTable.data.map((row, index) => (
                 <tr key={index}>
                   <td>{row.order_id}</td>
-                  <td>{row.item_id}</td>
+                  <td>{row.customer_id}</td>
+                  <td>{row.product_id}</td>
                   <td>{row.quantity}</td>
-                  <td>{row.item_name}</td>
-                  <td>{row.item_category}</td>
-                  <td>${row.base_price.toFixed(2)}</td>
+                  <td>{row.product_name}</td>
+                  <td>${row.product_price}</td>
                 </tr>
               ))}
             </tbody>
@@ -114,74 +103,126 @@ const SecondNF = () => {
       <h4>2NF Compliant Tables</h4>
 
       <div className="compliant-section">
-        <h5>Menu Items Table</h5>
+        <h5>Customers Table</h5>
         <div className="table-container">
           <table>
             <thead>
               <tr>
-                <th>🔑 Item ID</th>
-                <th>Name</th>
-                <th>🔗 Category ID</th>
-                <th>Description</th>
-                <th>Base Price</th>
+                <th>🔑 Customer ID</th>
+                <th>Customer Name</th>
               </tr>
             </thead>
             <tbody>
-              {menu_items.map((item, index) => (
+              {customers.map((customer, index) => (
                 <tr key={index}>
-                  <td>{item.item_id}</td>
-                  <td>{item.name}</td>
-                  <td>{item.category_id}</td>
-                  <td>{item.description}</td>
-                  <td>${item.base_price.toFixed(2)}</td>
+                  <td>{customer.customer_id}</td>
+                  <td>{customer.customer_name}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        <h5>Order Items Table</h5>
+        <h5>Phone Numbers Table</h5>
+        <div className="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>🔗 Customer ID</th>
+                <th>Phone Number</th>
+              </tr>
+            </thead>
+            <tbody>
+              {phone_numbers.map((phone, index) => (
+                <tr key={index}>
+                  <td>{phone.customer_id}</td>
+                  <td>{phone.phone_number}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <h5>Addresses Table</h5>
+        <div className="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>🔗 Customer ID</th>
+                <th>Street Address</th>
+                <th>City</th>
+              </tr>
+            </thead>
+            <tbody>
+              {addresses.map((address, index) => (
+                <tr key={index}>
+                  <td>{address.customer_id}</td>
+                  <td>{address.street_address}</td>
+                  <td>{address.city}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <h5>Products Table</h5>
+        <div className="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>🔑 Product ID</th>
+                <th>Product Name</th>
+                <th>Unit Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              {products.map((product, index) => (
+                <tr key={index}>
+                  <td>{product.product_id}</td>
+                  <td>{product.product_name}</td>
+                  <td>${product.unit_price}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <h5>Orders Table</h5>
+        <div className="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>🔑 Order ID</th>
+                <th>🔗 Customer ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map((order, index) => (
+                <tr key={index}>
+                  <td>{order.order_id}</td>
+                  <td>{order.customer_id}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <h5>Order Details Table</h5>
         <div className="table-container">
           <table>
             <thead>
               <tr>
                 <th>🔐 Order ID</th>
-                <th>🔐 Item ID</th>
+                <th>🔐 Product ID</th>
                 <th>Quantity</th>
-                <th>Price at Time</th>
-                <th>Special Instructions</th>
               </tr>
             </thead>
             <tbody>
-              {order_items.map((item, index) => (
+              {order_details.map((detail, index) => (
                 <tr key={index}>
-                  <td>{item.order_id}</td>
-                  <td>{item.item_id}</td>
-                  <td>{item.quantity}</td>
-                  <td>${item.price_at_time.toFixed(2)}</td>
-                  <td>{item.special_instructions || '-'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <h5>Categories Table</h5>
-        <div className="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>🔑 Category ID</th>
-                <th>Name</th>
-                <th>Kitchen Section</th>
-              </tr>
-            </thead>
-            <tbody>
-              {categories.map((category, index) => (
-                <tr key={index}>
-                  <td>{category.category_id}</td>
-                  <td>{category.name}</td>
-                  <td>{category.kitchen_section}</td>
+                  <td>{detail.order_id}</td>
+                  <td>{detail.product_id}</td>
+                  <td>{detail.quantity}</td>
                 </tr>
               ))}
             </tbody>

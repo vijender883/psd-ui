@@ -1,76 +1,65 @@
-// FifthNF.js
 import React from 'react';
 
 const FifthNF = () => {
   // Example of a table that violates 5NF
   const violatingTable = {
-    name: "Supplier_Item_Kitchen_NonCompliant",
+    name: "Customer_Product_Order_NonCompliant",
     description: "Violates 5NF due to cyclic join dependency",
     data: [
-      { supplier_id: "S001", item_id: "I001", kitchen_id: "K001", 
-        delivery_day: "Monday", quality_rating: "A" },
-      { supplier_id: "S002", item_id: "I001", kitchen_id: "K001", 
-        delivery_day: "Tuesday", quality_rating: "B" },
-      { supplier_id: "S001", item_id: "I002", kitchen_id: "K002", 
-        delivery_day: "Wednesday", quality_rating: "A" }
+      { customer_id: 1, product_id: "P1", order_id: 1, 
+        order_date: "2025-02-11", category: "Electronics" },
+      { customer_id: 1, product_id: "P2", order_id: 2, 
+        order_date: "2025-02-11", category: "Accessories" },
+      { customer_id: 1, product_id: "P3", order_id: 3, 
+        order_date: "2025-02-11", category: "Accessories" }
     ]
   };
 
   // Base Tables (5NF Compliant)
-  const suppliers = [
-    { supplier_id: "S001", name: "Fresh Foods Inc", rating: "A", 
-      contact: "John Supplier" },
-    { supplier_id: "S002", name: "Quality Grocers", rating: "B", 
-      contact: "Mary Vendor" }
+  const customers = [
+    { customer_id: 1, customer_name: "John Smith", join_date: "2025-01-01" }
   ];
 
-  const items = [
-    { item_id: "I001", name: "Fresh Tomatoes", category: "Produce", 
-      storage_temp: "4C" },
-    { item_id: "I002", name: "Mozzarella", category: "Dairy", 
-      storage_temp: "2C" }
+  const products = [
+    { product_id: "P1", product_name: "Laptop", category_id: "CAT1", unit_price: 1000 },
+    { product_id: "P2", product_name: "Mouse", category_id: "CAT2", unit_price: 20 },
+    { product_id: "P3", product_name: "Keyboard", category_id: "CAT2", unit_price: 50 }
   ];
 
-  const kitchens = [
-    { kitchen_id: "K001", name: "Main Kitchen", location: "Ground Floor" },
-    { kitchen_id: "K002", name: "Prep Kitchen", location: "Basement" }
+  const categories = [
+    { category_id: "CAT1", category_name: "Electronics", type: "Hardware" },
+    { category_id: "CAT2", category_name: "Accessories", type: "Peripherals" }
   ];
 
   // Relationship Tables (5NF Compliant)
-  const supplier_items = [
-    { supplier_id: "S001", item_id: "I001", base_price: 2.50, 
-      min_order: 10, lead_time: "2 days" },
-    { supplier_id: "S002", item_id: "I001", base_price: 2.75, 
-      min_order: 5, lead_time: "1 day" }
+  const customer_preferences = [
+    { customer_id: 1, category_id: "CAT1", preference_level: "High" },
+    { customer_id: 1, category_id: "CAT2", preference_level: "Medium" }
   ];
 
-  const kitchen_items = [
-    { kitchen_id: "K001", item_id: "I001", par_level: 50, 
-      reorder_point: 20, storage_location: "Shelf A1" },
-    { kitchen_id: "K002", item_id: "I002", par_level: 30, 
-      reorder_point: 10, storage_location: "Fridge B2" }
+  const orders = [
+    { order_id: 1, customer_id: 1, order_date: "2025-02-11", status_id: "S1" },
+    { order_id: 2, customer_id: 1, order_date: "2025-02-11", status_id: "S2" },
+    { order_id: 3, customer_id: 1, order_date: "2025-02-11", status_id: "S3" }
   ];
 
-  const supplier_kitchens = [
-    { supplier_id: "S001", kitchen_id: "K001", delivery_schedule: "Mon,Wed,Fri", 
-      delivery_window: "6AM-8AM" },
-    { supplier_id: "S002", kitchen_id: "K001", delivery_schedule: "Tue,Thu", 
-      delivery_window: "7AM-9AM" }
+  const order_details = [
+    { order_detail_id: "OD1", order_id: 1, product_id: "P1", quantity: 1, unit_price_at_order: 1000 },
+    { order_detail_id: "OD2", order_id: 2, product_id: "P2", quantity: 2, unit_price_at_order: 20 },
+    { order_detail_id: "OD3", order_id: 3, product_id: "P3", quantity: 1, unit_price_at_order: 50 }
   ];
 
   // Additional Reference Tables
-  const quality_checks = [
-    { check_id: "QC001", supplier_id: "S001", item_id: "I001", 
-      date: "2024-02-11", score: 95, inspector: "Jane Quality" },
-    { check_id: "QC002", supplier_id: "S002", item_id: "I001", 
-      date: "2024-02-11", score: 88, inspector: "Bob Inspector" }
+  const order_status = [
+    { status_id: "S1", status_name: "Pending" },
+    { status_id: "S2", status_name: "Shipped" },
+    { status_id: "S3", status_name: "Delivered" }
   ];
 
   const price_history = [
-    { history_id: "PH001", supplier_id: "S001", item_id: "I001", 
-      price: 2.50, effective_date: "2024-01-01" },
-    { history_id: "PH002", supplier_id: "S001", item_id: "I001", 
-      price: 2.75, effective_date: "2024-02-01" }
+    { history_id: "PH1", product_id: "P1", price: 1000, effective_date: "2025-01-01" },
+    { history_id: "PH2", product_id: "P2", price: 20, effective_date: "2025-01-01" },
+    { history_id: "PH3", product_id: "P3", price: 50, effective_date: "2025-01-01" }
   ];
 
   return (
@@ -101,27 +90,27 @@ const FifthNF = () => {
         <h4>Example of 5NF Violation</h4>
         <p className="violation-note">
           This table violates 5NF because it contains a cyclic relationship between 
-          suppliers, items, and kitchens:
+          customers, products, and orders:
         </p>
         <div className="table-container">
           <table>
             <thead>
               <tr>
-                <th>❌ Supplier ID</th>
-                <th>❌ Item ID</th>
-                <th>❌ Kitchen ID</th>
-                <th>Delivery Day</th>
-                <th>Quality Rating</th>
+                <th>❌ Customer ID</th>
+                <th>❌ Product ID</th>
+                <th>❌ Order ID</th>
+                <th>Order Date</th>
+                <th>Category</th>
               </tr>
             </thead>
             <tbody>
               {violatingTable.data.map((row, index) => (
                 <tr key={index}>
-                  <td>{row.supplier_id}</td>
-                  <td>{row.item_id}</td>
-                  <td>{row.kitchen_id}</td>
-                  <td>{row.delivery_day}</td>
-                  <td>{row.quality_rating}</td>
+                  <td>{row.customer_id}</td>
+                  <td>{row.product_id}</td>
+                  <td>{row.order_id}</td>
+                  <td>{row.order_date}</td>
+                  <td>{row.category}</td>
                 </tr>
               ))}
             </tbody>
@@ -130,9 +119,9 @@ const FifthNF = () => {
         <p className="join-dependencies">
           Join Dependencies:
           <ul>
-            <li>Supplier ↺ Item (supplier can provide multiple items)</li>
-            <li>Item ↺ Kitchen (items can be used in multiple kitchens)</li>
-            <li>Kitchen ↺ Supplier (kitchens can receive from multiple suppliers)</li>
+            <li>Customer ↺ Product (customer can order multiple products)</li>
+            <li>Product ↺ Order (products can be in multiple orders)</li>
+            <li>Order ↺ Customer (orders belong to customers)</li>
           </ul>
         </p>
       </div>
@@ -143,48 +132,68 @@ const FifthNF = () => {
       <div className="compliant-section">
         <h5>Base Tables</h5>
         
-        <h6>Suppliers</h6>
+        <h6>Customers</h6>
         <div className="table-container">
           <table>
             <thead>
               <tr>
-                <th>🔑 Supplier ID</th>
-                <th>Name</th>
-                <th>Rating</th>
-                <th>Contact</th>
+                <th>🔑 Customer ID</th>
+                <th>Customer Name</th>
+                <th>Join Date</th>
               </tr>
             </thead>
             <tbody>
-              {suppliers.map((supplier, index) => (
+              {customers.map((customer, index) => (
                 <tr key={index}>
-                  <td>{supplier.supplier_id}</td>
-                  <td>{supplier.name}</td>
-                  <td>{supplier.rating}</td>
-                  <td>{supplier.contact}</td>
+                  <td>{customer.customer_id}</td>
+                  <td>{customer.customer_name}</td>
+                  <td>{customer.join_date}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        <h6>Items</h6>
+        <h6>Products</h6>
         <div className="table-container">
           <table>
             <thead>
               <tr>
-                <th>🔑 Item ID</th>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Storage Temp</th>
+                <th>🔑 Product ID</th>
+                <th>Product Name</th>
+                <th>🔗 Category ID</th>
+                <th>Unit Price</th>
               </tr>
             </thead>
             <tbody>
-              {items.map((item, index) => (
+              {products.map((product, index) => (
                 <tr key={index}>
-                  <td>{item.item_id}</td>
-                  <td>{item.name}</td>
-                  <td>{item.category}</td>
-                  <td>{item.storage_temp}</td>
+                  <td>{product.product_id}</td>
+                  <td>{product.product_name}</td>
+                  <td>{product.category_id}</td>
+                  <td>${product.unit_price}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <h6>Categories</h6>
+        <div className="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>🔑 Category ID</th>
+                <th>Category Name</th>
+                <th>Type</th>
+              </tr>
+            </thead>
+            <tbody>
+              {categories.map((category, index) => (
+                <tr key={index}>
+                  <td>{category.category_id}</td>
+                  <td>{category.category_name}</td>
+                  <td>{category.type}</td>
                 </tr>
               ))}
             </tbody>
@@ -196,90 +205,76 @@ const FifthNF = () => {
       <div className="compliant-section">
         <h5>Binary Relationships (5NF Compliant)</h5>
         
-        <h6>Supplier-Item Relationships</h6>
+        <h6>Customer Preferences</h6>
         <div className="table-container">
           <table>
             <thead>
               <tr>
-                <th>🔐 Supplier ID</th>
-                <th>🔐 Item ID</th>
-                <th>Base Price</th>
-                <th>Min Order</th>
-                <th>Lead Time</th>
+                <th>🔐 Customer ID</th>
+                <th>🔐 Category ID</th>
+                <th>Preference Level</th>
               </tr>
             </thead>
             <tbody>
-              {supplier_items.map((si, index) => (
+              {customer_preferences.map((pref, index) => (
                 <tr key={index}>
-                  <td>{si.supplier_id}</td>
-                  <td>{si.item_id}</td>
-                  <td>${si.base_price}</td>
-                  <td>{si.min_order}</td>
-                  <td>{si.lead_time}</td>
+                  <td>{pref.customer_id}</td>
+                  <td>{pref.category_id}</td>
+                  <td>{pref.preference_level}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        <h6>Kitchen-Item Relationships</h6>
+        <h6>Orders</h6>
         <div className="table-container">
           <table>
             <thead>
               <tr>
-                <th>🔐 Kitchen ID</th>
-                <th>🔐 Item ID</th>
-                <th>Par Level</th>
-                <th>Reorder Point</th>
-                <th>Storage Location</th>
+                <th>🔑 Order ID</th>
+                <th>🔗 Customer ID</th>
+                <th>Order Date</th>
+                <th>🔗 Status ID</th>
               </tr>
             </thead>
             <tbody>
-              {kitchen_items.map((ki, index) => (
+              {orders.map((order, index) => (
                 <tr key={index}>
-                  <td>{ki.kitchen_id}</td>
-                  <td>{ki.item_id}</td>
-                  <td>{ki.par_level}</td>
-                  <td>{ki.reorder_point}</td>
-                  <td>{ki.storage_location}</td>
+                  <td>{order.order_id}</td>
+                  <td>{order.customer_id}</td>
+                  <td>{order.order_date}</td>
+                  <td>{order.status_id}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      </div>
 
-      {/* Historical/Audit Tables */}
-      <div className="compliant-section">
-        <h5>Historical Records (Supporting Tables)</h5>
-        
-        <h6>Quality Checks</h6>
+        <h6>Order Details</h6>
         <div className="table-container">
           <table>
             <thead>
               <tr>
-                <th>🔑 Check ID</th>
-                <th>🔗 Supplier ID</th>
-                <th>🔗 Item ID</th>
-                <th>Date</th>
-                <th>Score</th>
-                <th>Inspector</th>
+                <th>🔑 Order Detail ID</th>
+                <th>🔗 Order ID</th>
+                <th>🔗 Product ID</th>
+                <th>Quantity</th>
+                <th>Unit Price at Order</th>
               </tr>
             </thead>
             <tbody>
-              {quality_checks.map((qc, index) => (
+              {order_details.map((detail, index) => (
                 <tr key={index}>
-                  <td>{qc.check_id}</td>
-                  <td>{qc.supplier_id}</td>
-                  <td>{qc.item_id}</td>
-                  <td>{qc.date}</td>
-                  <td>{qc.score}</td>
-                  <td>{qc.inspector}</td>
+                  <td>{detail.order_detail_id}</td>
+                  <td>{detail.order_id}</td>
+                  <td>{detail.product_id}</td>
+                  <td>{detail.quantity}</td>
+                  <td>${detail.unit_price_at_order}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-          
         </div>
       </div>
 
@@ -324,7 +319,7 @@ const FifthNF = () => {
         th {
           background-color: #f5f5f5;
         }
-        h6 {
+        h5, h6 {
           color: #2563eb;
           margin: 20px 0 10px 0;
         }

@@ -1,58 +1,51 @@
-// BCNF.js
 import React from 'react';
 
 const BCNF = () => {
   // Example of a table that violates BCNF
   const violatingTable = {
-    name: "Course_Instructor_NonCompliant",
-    description: "Violates BCNF because instructor determines subject but isn't a key",
+    name: "Product_Categories_NonCompliant",
+    description: "Violates BCNF because category determines product type but isn't a key",
     data: [
-      { course_id: "C001", instructor_id: "I001", subject: "Italian Cuisine", 
-        time_slot: "Morning", room: "Kitchen 1" },
-      { course_id: "C002", instructor_id: "I001", subject: "Italian Cuisine", 
-        time_slot: "Evening", room: "Kitchen 2" },
-      { course_id: "C003", instructor_id: "I002", subject: "French Cuisine", 
-        time_slot: "Morning", room: "Kitchen 1" }
+      { product_id: "P1", category_id: "CAT1", product_name: "Laptop", 
+        category_name: "Electronics", category_type: "Hardware" },
+      { product_id: "P2", category_id: "CAT2", product_name: "Mouse", 
+        category_name: "Accessories", category_type: "Peripherals" },
+      { product_id: "P3", category_id: "CAT2", product_name: "Keyboard", 
+        category_name: "Accessories", category_type: "Peripherals" }
     ]
   };
 
   // BCNF Compliant Tables
-  const instructors = [
-    { instructor_id: "I001", name: "Chef Mario", specialty: "Italian Cuisine", 
-      certification_level: "Master" },
-    { instructor_id: "I002", name: "Chef Pierre", specialty: "French Cuisine", 
-      certification_level: "Master" }
+  const product_categories = [
+    { category_id: "CAT1", category_name: "Electronics", category_type: "Hardware" },
+    { category_id: "CAT2", category_name: "Accessories", category_type: "Peripherals" }
   ];
 
-  const instructor_subjects = [
-    { instructor_id: "I001", subject_id: "S001" },
-    { instructor_id: "I002", subject_id: "S002" }
+  const products = [
+    { product_id: "P1", product_name: "Laptop", category_id: "CAT1", unit_price: 1000 },
+    { product_id: "P2", product_name: "Mouse", category_id: "CAT2", unit_price: 20 },
+    { product_id: "P3", product_name: "Keyboard", category_id: "CAT2", unit_price: 50 }
   ];
 
-  const subjects = [
-    { subject_id: "S001", name: "Italian Cuisine", description: "Traditional Italian cooking" },
-    { subject_id: "S002", name: "French Cuisine", description: "Classic French techniques" }
+  const order_status = [
+    { status_id: "S1", status_name: "Pending" },
+    { status_id: "S2", status_name: "Shipped" },
+    { status_id: "S3", status_name: "Delivered" }
   ];
 
-  const courses = [
-    { course_id: "C001", subject_id: "S001", instructor_id: "I001", 
-      time_slot: "Morning", room: "Kitchen 1", start_date: "2024-03-01" },
-    { course_id: "C002", subject_id: "S001", instructor_id: "I001", 
-      time_slot: "Evening", room: "Kitchen 2", start_date: "2024-03-01" }
+  const orders = [
+    { order_id: 1, customer_id: 1, order_date: "2025-02-11", status_id: "S1" },
+    { order_id: 2, customer_id: 1, order_date: "2025-02-11", status_id: "S2" },
+    { order_id: 3, customer_id: 1, order_date: "2025-02-11", status_id: "S3" }
   ];
 
-  const certifications = [
-    { certification_id: "CERT001", name: "Master Italian Chef", 
-      issuing_body: "Italian Culinary Institute" },
-    { certification_id: "CERT002", name: "Master French Chef", 
-      issuing_body: "French Culinary Institute" }
-  ];
-
-  const instructor_certifications = [
-    { instructor_id: "I001", certification_id: "CERT001", 
-      date_earned: "2020-01-15", valid_until: "2025-01-15" },
-    { instructor_id: "I002", certification_id: "CERT002", 
-      date_earned: "2019-06-20", valid_until: "2024-06-20" }
+  const order_details = [
+    { order_detail_id: "OD1", order_id: 1, product_id: "P1", quantity: 1, 
+      unit_price_at_order: 1000 },
+    { order_detail_id: "OD2", order_id: 2, product_id: "P2", quantity: 2, 
+      unit_price_at_order: 20 },
+    { order_detail_id: "OD3", order_id: 3, product_id: "P3", quantity: 1, 
+      unit_price_at_order: 50 }
   ];
 
   return (
@@ -80,130 +73,152 @@ const BCNF = () => {
       <div className="example-violation">
         <h4>Example of BCNF Violation</h4>
         <p className="violation-note">
-          This table violates BCNF because instructor determines subject, 
-          but instructor_id is not a candidate key:
+          This table violates BCNF because category determines category type, 
+          but category_id is not a candidate key for the full table:
         </p>
         <div className="table-container">
           <table>
             <thead>
               <tr>
-                <th>🔑 Course ID</th>
-                <th>🎯 Instructor ID</th>
-                <th>❌ Subject</th>
-                <th>Time Slot</th>
-                <th>Room</th>
+                <th>🔑 Product ID</th>
+                <th>🎯 Category ID</th>
+                <th>Product Name</th>
+                <th>❌ Category Name</th>
+                <th>❌ Category Type</th>
               </tr>
             </thead>
             <tbody>
               {violatingTable.data.map((row, index) => (
                 <tr key={index}>
-                  <td>{row.course_id}</td>
-                  <td>{row.instructor_id}</td>
-                  <td>{row.subject}</td>
-                  <td>{row.time_slot}</td>
-                  <td>{row.room}</td>
+                  <td>{row.product_id}</td>
+                  <td>{row.category_id}</td>
+                  <td>{row.product_name}</td>
+                  <td>{row.category_name}</td>
+                  <td>{row.category_type}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
         <p className="violation-explanation">
-          Functional dependency: instructor_id → subject <br/>
-          This violates BCNF because instructor_id is not a superkey
+          Functional dependency: category_id → category_name, category_type <br/>
+          This violates BCNF because category_id is not a superkey
         </p>
       </div>
 
       <h4>BCNF Compliant Tables</h4>
 
       <div className="compliant-section">
-        <h5>Instructors Table</h5>
+        <h5>Product Categories Table</h5>
         <div className="table-container">
           <table>
             <thead>
               <tr>
-                <th>🔑 Instructor ID</th>
-                <th>Name</th>
-                <th>Specialty</th>
-                <th>Certification Level</th>
+                <th>🔑 Category ID</th>
+                <th>Category Name</th>
+                <th>Category Type</th>
               </tr>
             </thead>
             <tbody>
-              {instructors.map((instructor, index) => (
+              {product_categories.map((category, index) => (
                 <tr key={index}>
-                  <td>{instructor.instructor_id}</td>
-                  <td>{instructor.name}</td>
-                  <td>{instructor.specialty}</td>
-                  <td>{instructor.certification_level}</td>
+                  <td>{category.category_id}</td>
+                  <td>{category.category_name}</td>
+                  <td>{category.category_type}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        <h5>Subjects Table</h5>
+        <h5>Products Table</h5>
         <div className="table-container">
           <table>
             <thead>
               <tr>
-                <th>🔑 Subject ID</th>
-                <th>Name</th>
-                <th>Description</th>
+                <th>🔑 Product ID</th>
+                <th>Product Name</th>
+                <th>🔗 Category ID</th>
+                <th>Unit Price</th>
               </tr>
             </thead>
             <tbody>
-              {subjects.map((subject, index) => (
+              {products.map((product, index) => (
                 <tr key={index}>
-                  <td>{subject.subject_id}</td>
-                  <td>{subject.name}</td>
-                  <td>{subject.description}</td>
+                  <td>{product.product_id}</td>
+                  <td>{product.product_name}</td>
+                  <td>{product.category_id}</td>
+                  <td>${product.unit_price}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        <h5>Instructor Subjects Table</h5>
+        <h5>Order Status Table</h5>
         <div className="table-container">
           <table>
             <thead>
               <tr>
-                <th>🔐 Instructor ID</th>
-                <th>🔐 Subject ID</th>
+                <th>🔑 Status ID</th>
+                <th>Status Name</th>
               </tr>
             </thead>
             <tbody>
-              {instructor_subjects.map((is, index) => (
+              {order_status.map((status, index) => (
                 <tr key={index}>
-                  <td>{is.instructor_id}</td>
-                  <td>{is.subject_id}</td>
+                  <td>{status.status_id}</td>
+                  <td>{status.status_name}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        <h5>Courses Table</h5>
+        <h5>Orders Table</h5>
         <div className="table-container">
           <table>
             <thead>
               <tr>
-                <th>🔑 Course ID</th>
-                <th>🔗 Subject ID</th>
-                <th>🔗 Instructor ID</th>
-                <th>Time Slot</th>
-                <th>Room</th>
-                <th>Start Date</th>
+                <th>🔑 Order ID</th>
+                <th>🔗 Customer ID</th>
+                <th>Order Date</th>
+                <th>🔗 Status ID</th>
               </tr>
             </thead>
             <tbody>
-              {courses.map((course, index) => (
+              {orders.map((order, index) => (
                 <tr key={index}>
-                  <td>{course.course_id}</td>
-                  <td>{course.subject_id}</td>
-                  <td>{course.instructor_id}</td>
-                  <td>{course.time_slot}</td>
-                  <td>{course.room}</td>
-                  <td>{course.start_date}</td>
+                  <td>{order.order_id}</td>
+                  <td>{order.customer_id}</td>
+                  <td>{order.order_date}</td>
+                  <td>{order.status_id}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <h5>Order Details Table</h5>
+        <div className="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>🔑 Order Detail ID</th>
+                <th>🔗 Order ID</th>
+                <th>🔗 Product ID</th>
+                <th>Quantity</th>
+                <th>Unit Price at Order</th>
+              </tr>
+            </thead>
+            <tbody>
+              {order_details.map((detail, index) => (
+                <tr key={index}>
+                  <td>{detail.order_detail_id}</td>
+                  <td>{detail.order_id}</td>
+                  <td>{detail.product_id}</td>
+                  <td>{detail.quantity}</td>
+                  <td>${detail.unit_price_at_order}</td>
                 </tr>
               ))}
             </tbody>

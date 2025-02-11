@@ -1,61 +1,62 @@
-// ThirdNF.js
 import React from 'react';
 
 const ThirdNF = () => {
   // Example of a table that violates 3NF
   const violatingTable = {
-    name: "Employee_Department_NonCompliant",
+    name: "Customer_Orders_NonCompliant",
     description: "Violates 3NF due to transitive dependencies",
     data: [
-      { employee_id: "E001", name: "Alice Johnson", department_id: "D001", 
-        department_name: "Service", manager_id: "M001", manager_name: "John Smith",
-        location_id: "L001", location_address: "123 Restaurant St" },
-      { employee_id: "E002", name: "Bob Wilson", department_id: "D001", 
-        department_name: "Service", manager_id: "M001", manager_name: "John Smith",
-        location_id: "L001", location_address: "123 Restaurant St" }
+      { order_id: 1, customer_id: 1, customer_name: "John Smith", 
+        city_id: "C1", city_name: "New York", country: "USA",
+        product_id: "P1", product_name: "Laptop", category: "Electronics" },
+      { order_id: 2, customer_id: 1, customer_name: "John Smith", 
+        city_id: "C2", city_name: "Boston", country: "USA",
+        product_id: "P2", product_name: "Mouse", category: "Accessories" }
     ]
   };
 
   // 3NF Compliant Tables
-  const employees = [
-    { employee_id: "E001", name: "Alice Johnson", department_id: "D001", 
-      hire_date: "2024-01-15", position_id: "P001" },
-    { employee_id: "E002", name: "Bob Wilson", department_id: "D001", 
-      hire_date: "2024-01-20", position_id: "P002" }
+  const customers = [
+    { customer_id: 1, customer_name: "John Smith" }
   ];
 
-  const departments = [
-    { department_id: "D001", name: "Service", manager_id: "M001", location_id: "L001" },
-    { department_id: "D002", name: "Kitchen", manager_id: "M002", location_id: "L001" }
+  const phone_numbers = [
+    { phone_id: "PH1", customer_id: 1, phone_number: "555-0123" },
+    { phone_id: "PH2", customer_id: 1, phone_number: "555-0124" },
+    { phone_id: "PH3", customer_id: 1, phone_number: "555-0125" }
   ];
 
-  const managers = [
-    { manager_id: "M001", employee_id: "E005", start_date: "2023-01-01" },
-    { manager_id: "M002", employee_id: "E006", start_date: "2023-02-01" }
+  const cities = [
+    { city_id: "C1", city_name: "New York", country: "USA" },
+    { city_id: "C2", city_name: "Boston", country: "USA" }
   ];
 
-  const locations = [
-    { location_id: "L001", address: "123 Restaurant St", city: "Food City", 
-      state: "FC", zip: "12345" },
-    { location_id: "L002", address: "456 Dining Ave", city: "Food City", 
-      state: "FC", zip: "12345" }
+  const addresses = [
+    { address_id: "A1", customer_id: 1, street_address: "123 Main St", city_id: "C1" },
+    { address_id: "A2", customer_id: 1, street_address: "456 Park Ave", city_id: "C2" }
   ];
 
-  const positions = [
-    { position_id: "P001", title: "Server", base_pay: "15.00", 
-      required_certification: "CERT001" },
-    { position_id: "P002", title: "Host", base_pay: "14.00", 
-      required_certification: null }
+  const products = [
+    { product_id: "P1", product_name: "Laptop", category_id: "CAT1", unit_price: 1000 },
+    { product_id: "P2", product_name: "Mouse", category_id: "CAT2", unit_price: 20 },
+    { product_id: "P3", product_name: "Keyboard", category_id: "CAT2", unit_price: 50 }
   ];
 
-  const certifications = [
-    { certification_id: "CERT001", name: "Food Safety", issuing_body: "FDA", 
-      validity_years: 2 }
+  const categories = [
+    { category_id: "CAT1", category_name: "Electronics" },
+    { category_id: "CAT2", category_name: "Accessories" }
   ];
 
-  const employee_certifications = [
-    { employee_id: "E001", certification_id: "CERT001", 
-      date_earned: "2024-01-10", expiry_date: "2026-01-10" }
+  const orders = [
+    { order_id: 1, customer_id: 1, order_date: "2025-02-11" },
+    { order_id: 2, customer_id: 1, order_date: "2025-02-11" },
+    { order_id: 3, customer_id: 1, order_date: "2025-02-11" }
+  ];
+
+  const order_details = [
+    { order_detail_id: "OD1", order_id: 1, product_id: "P1", quantity: 1 },
+    { order_detail_id: "OD2", order_id: 2, product_id: "P2", quantity: 2 },
+    { order_detail_id: "OD3", order_id: 3, product_id: "P3", quantity: 1 }
   ];
 
   return (
@@ -84,35 +85,36 @@ const ThirdNF = () => {
         <h4>Example of 3NF Violation</h4>
         <p className="violation-note">This structure violates 3NF because:</p>
         <ul className="violation-list">
-          <li>employee_id → department_id → department_name</li>
-          <li>department_id → manager_id → manager_name</li>
-          <li>department_id → location_id → location_address</li>
+          <li>customer_id → city_id → city_name → country</li>
+          <li>product_id → category_id → category_name</li>
         </ul>
         <div className="table-container">
           <table>
             <thead>
               <tr>
-                <th>🔑 Employee ID</th>
-                <th>✅ Name</th>
-                <th>🔗 Department ID</th>
-                <th>➡️ Department Name</th>
-                <th>➡️ Manager ID</th>
-                <th>➡️ Manager Name</th>
-                <th>➡️ Location ID</th>
-                <th>➡️ Location Address</th>
+                <th>🔑 Order ID</th>
+                <th>🔗 Customer ID</th>
+                <th>➡️ Customer Name</th>
+                <th>➡️ City ID</th>
+                <th>➡️ City Name</th>
+                <th>➡️ Country</th>
+                <th>🔗 Product ID</th>
+                <th>➡️ Product Name</th>
+                <th>➡️ Category</th>
               </tr>
             </thead>
             <tbody>
               {violatingTable.data.map((row, index) => (
                 <tr key={index}>
-                  <td>{row.employee_id}</td>
-                  <td>{row.name}</td>
-                  <td>{row.department_id}</td>
-                  <td>{row.department_name}</td>
-                  <td>{row.manager_id}</td>
-                  <td>{row.manager_name}</td>
-                  <td>{row.location_id}</td>
-                  <td>{row.location_address}</td>
+                  <td>{row.order_id}</td>
+                  <td>{row.customer_id}</td>
+                  <td>{row.customer_name}</td>
+                  <td>{row.city_id}</td>
+                  <td>{row.city_name}</td>
+                  <td>{row.country}</td>
+                  <td>{row.product_id}</td>
+                  <td>{row.product_name}</td>
+                  <td>{row.category}</td>
                 </tr>
               ))}
             </tbody>
@@ -123,98 +125,178 @@ const ThirdNF = () => {
       <h4>3NF Compliant Tables</h4>
 
       <div className="compliant-section">
-        <h5>Employees Table</h5>
+        <h5>Customers Table</h5>
         <div className="table-container">
           <table>
             <thead>
               <tr>
-                <th>🔑 Employee ID</th>
-                <th>✅ Name</th>
-                <th>🔗 Department ID</th>
-                <th>✅ Hire Date</th>
-                <th>🔗 Position ID</th>
+                <th>🔑 Customer ID</th>
+                <th>✅ Customer Name</th>
               </tr>
             </thead>
             <tbody>
-              {employees.map((emp, index) => (
+              {customers.map((customer, index) => (
                 <tr key={index}>
-                  <td>{emp.employee_id}</td>
-                  <td>{emp.name}</td>
-                  <td>{emp.department_id}</td>
-                  <td>{emp.hire_date}</td>
-                  <td>{emp.position_id}</td>
+                  <td>{customer.customer_id}</td>
+                  <td>{customer.customer_name}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        <h5>Departments Table</h5>
+        <h5>Phone Numbers Table</h5>
         <div className="table-container">
           <table>
             <thead>
               <tr>
-                <th>🔑 Department ID</th>
-                <th>✅ Name</th>
-                <th>🔗 Manager ID</th>
-                <th>🔗 Location ID</th>
+                <th>🔑 Phone ID</th>
+                <th>🔗 Customer ID</th>
+                <th>✅ Phone Number</th>
               </tr>
             </thead>
             <tbody>
-              {departments.map((dept, index) => (
+              {phone_numbers.map((phone, index) => (
                 <tr key={index}>
-                  <td>{dept.department_id}</td>
-                  <td>{dept.name}</td>
-                  <td>{dept.manager_id}</td>
-                  <td>{dept.location_id}</td>
+                  <td>{phone.phone_id}</td>
+                  <td>{phone.customer_id}</td>
+                  <td>{phone.phone_number}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        <h5>Positions Table</h5>
+        <h5>Cities Table</h5>
         <div className="table-container">
           <table>
             <thead>
               <tr>
-                <th>🔑 Position ID</th>
-                <th>✅ Title</th>
-                <th>✅ Base Pay</th>
-                <th>🔗 Required Certification</th>
+                <th>🔑 City ID</th>
+                <th>✅ City Name</th>
+                <th>✅ Country</th>
               </tr>
             </thead>
             <tbody>
-              {positions.map((pos, index) => (
+              {cities.map((city, index) => (
                 <tr key={index}>
-                  <td>{pos.position_id}</td>
-                  <td>{pos.title}</td>
-                  <td>${pos.base_pay}</td>
-                  <td>{pos.required_certification || '-'}</td>
+                  <td>{city.city_id}</td>
+                  <td>{city.city_name}</td>
+                  <td>{city.country}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        <h5>Employee Certifications Table</h5>
+        <h5>Addresses Table</h5>
         <div className="table-container">
           <table>
             <thead>
               <tr>
-                <th>🔗 Employee ID</th>
-                <th>🔗 Certification ID</th>
-                <th>✅ Date Earned</th>
-                <th>✅ Expiry Date</th>
+                <th>🔑 Address ID</th>
+                <th>🔗 Customer ID</th>
+                <th>✅ Street Address</th>
+                <th>🔗 City ID</th>
               </tr>
             </thead>
             <tbody>
-              {employee_certifications.map((cert, index) => (
+              {addresses.map((address, index) => (
                 <tr key={index}>
-                  <td>{cert.employee_id}</td>
-                  <td>{cert.certification_id}</td>
-                  <td>{cert.date_earned}</td>
-                  <td>{cert.expiry_date}</td>
+                  <td>{address.address_id}</td>
+                  <td>{address.customer_id}</td>
+                  <td>{address.street_address}</td>
+                  <td>{address.city_id}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <h5>Categories Table</h5>
+        <div className="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>🔑 Category ID</th>
+                <th>✅ Category Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              {categories.map((category, index) => (
+                <tr key={index}>
+                  <td>{category.category_id}</td>
+                  <td>{category.category_name}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <h5>Products Table</h5>
+        <div className="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>🔑 Product ID</th>
+                <th>✅ Product Name</th>
+                <th>🔗 Category ID</th>
+                <th>✅ Unit Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              {products.map((product, index) => (
+                <tr key={index}>
+                  <td>{product.product_id}</td>
+                  <td>{product.product_name}</td>
+                  <td>{product.category_id}</td>
+                  <td>${product.unit_price}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <h5>Orders Table</h5>
+        <div className="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>🔑 Order ID</th>
+                <th>🔗 Customer ID</th>
+                <th>✅ Order Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map((order, index) => (
+                <tr key={index}>
+                  <td>{order.order_id}</td>
+                  <td>{order.customer_id}</td>
+                  <td>{order.order_date}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <h5>Order Details Table</h5>
+        <div className="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>🔑 Order Detail ID</th>
+                <th>🔗 Order ID</th>
+                <th>🔗 Product ID</th>
+                <th>✅ Quantity</th>
+              </tr>
+            </thead>
+            <tbody>
+              {order_details.map((detail, index) => (
+                <tr key={index}>
+                  <td>{detail.order_detail_id}</td>
+                  <td>{detail.order_id}</td>
+                  <td>{detail.product_id}</td>
+                  <td>{detail.quantity}</td>
                 </tr>
               ))}
             </tbody>

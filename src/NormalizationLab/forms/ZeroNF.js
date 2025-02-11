@@ -1,189 +1,117 @@
-// ZeroNF.js
 import React from 'react';
 
 const ZeroNF = () => {
-  const restaurantData = [
+  const customerData = [
     {
-      order_id: "ORD001",
-      order_date: "2024-02-11 14:30",
-      customer_info: {
-        name: "John Doe",
-        phones: ["123-456-7890", "987-654-3210"],
-        address: "123 Main St, City, State, 12345",
-        email: "john@email.com, john.work@email.com"
-      },
-      order_details: {
-        items: [
-          { name: "Pizza Margherita", quantity: 2, price: 15.00, customization: "Extra cheese, No basil" },
-          { name: "Coca Cola", quantity: 3, price: 2.00, size: "Large" }
-        ],
-        special_instructions: "Deliver to back door\nCall upon arrival"
-      },
-      server_info: {
-        id: "S001",
-        name: "Alice Johnson",
-        shift: "Evening (4 PM - 12 AM)",
-        section: "Main Dining, Patio",
-        certifications: "Food Safety, Alcohol Service"
-      },
-      payment_info: {
-        methods: ["Credit Card *1234", "Gift Card *5678"],
-        subtotal: 36.00,
-        tax: 3.60,
-        tip: 8.00,
-        loyalty_points: "Earn: 36 points, Current Balance: 150"
-      }
-    },
-    {
-      order_id: "ORD002",
-      order_date: "2024-02-11 18:45",
-      customer_info: {
-        name: "Jane Smith",
-        phones: ["555-123-4567"],
-        address: "456 Oak Ave, City, State, 12345",
-        email: "jane@email.com"
-      },
-      order_details: {
-        items: [
-          { name: "Pasta Carbonara", quantity: 1, price: 18.00, customization: "Light sauce" },
-          { name: "Garlic Bread", quantity: 1, price: 5.00 },
-          { name: "House Wine", quantity: 1, price: 25.00, type: "Red, Merlot" }
-        ],
-        special_instructions: "Allergic to nuts"
-      },
-      server_info: {
-        id: "S001",
-        name: "Alice Johnson",
-        shift: "Evening (4 PM - 12 AM)",
-        section: "Main Dining",
-        certifications: "Food Safety, Alcohol Service"
-      },
-      payment_info: {
-        methods: ["Cash"],
-        subtotal: 48.00,
-        tax: 4.80,
-        tip: 10.00,
-        loyalty_points: "Earn: 48 points"
-      }
+      customer_name: "John Smith",
+      phone_numbers: ["555-0123", "555-0124", "555-0125"],
+      addresses: [
+        { street: "123 Main St", city: "New York" },
+        { street: "456 Park Ave", city: "Boston" }
+      ],
+      orders: [
+        {
+          order_id: 1,
+          product: "Laptop",
+          quantity: 1,
+          price: 1000
+        },
+        {
+          order_id: 2,
+          product: "Mouse",
+          quantity: 2,
+          price: 20
+        },
+        {
+          order_id: 3,
+          product: "Keyboard",
+          quantity: 1,
+          price: 50
+        }
+      ]
     }
   ];
 
   return (
-    <div>
-      <div className="description">
-        <h3>Unnormalized Form (0NF)</h3>
-        <p>Raw data containing multiple violations of normalization rules:</p>
-        <ul>
-          <li>Multi-valued attributes (phone numbers, email addresses)</li>
-          <li>Nested/Complex structures (order details, payment info)</li>
+    <div className="p-6">
+      <div className="mb-6">
+        <h3 className="text-xl font-bold mb-4">Unnormalized Form (0NF)</h3>
+        <p className="mb-2">Raw data containing multiple violations of normalization rules:</p>
+        <ul className="list-disc pl-6">
+          <li>Multi-valued attributes (phone numbers)</li>
+          <li>Nested/Complex structures (addresses, orders)</li>
           <li>Repeating groups (order items)</li>
-          <li>Non-atomic values (addresses, certifications)</li>
-          <li>Mixed data types (payment methods)</li>
-          <li>Redundant information (server details)</li>
+          <li>Non-atomic values (addresses)</li>
+          <li>No proper primary key structure</li>
         </ul>
       </div>
 
-      <div className="legend">
-        <p><strong>Key:</strong></p>
-        <ul>
+      <div className="mb-6 bg-gray-100 p-4 rounded">
+        <p className="font-bold">Key:</p>
+        <ul className="list-none">
           <li>🔑 - Natural Primary Key</li>
           <li>📦 - Composite/Complex Data</li>
           <li>🔄 - Repeating Groups</li>
           <li>📝 - Non-atomic Values</li>
-          <li>🔗 - Would be Foreign Key in normalized form</li>
         </ul>
       </div>
 
-      <div className="table-container">
-        <table>
+      <div className="overflow-x-auto">
+        <table className="min-w-full border">
           <thead>
-            <tr>
-              <th>🔑 Order ID</th>
-              <th>Order Date</th>
-              <th>📦 Customer Information
-                <div className="subheader">
-                  (Contains: 📝 Name, 🔄 Phones, 📝 Address, 🔄 Emails)
+            <tr className="bg-gray-50">
+              <th className="border p-2">Customer Name</th>
+              <th className="border p-2">
+                📦 Phone Numbers
+                <div className="text-sm text-gray-600">
+                  (🔄 Multiple Values)
                 </div>
               </th>
-              <th>📦 Order Details
-                <div className="subheader">
-                  (Contains: 🔄 Items, 📝 Special Instructions)
+              <th className="border p-2">
+                📦 Addresses
+                <div className="text-sm text-gray-600">
+                  (📝 Non-atomic, 🔄 Multiple)
                 </div>
               </th>
-              <th>📦 Server Information
-                <div className="subheader">
-                  (Contains: 🔗 ID, Name, 📝 Shift, 🔄 Section, 📝 Certifications)
-                </div>
-              </th>
-              <th>📦 Payment Information
-                <div className="subheader">
-                  (Contains: 🔄 Methods, Amounts, 📝 Loyalty Info)
+              <th className="border p-2">
+                📦 Orders
+                <div className="text-sm text-gray-600">
+                  (🔄 Repeating Groups)
                 </div>
               </th>
             </tr>
           </thead>
           <tbody>
-            {restaurantData.map((row, index) => (
+            {customerData.map((customer, index) => (
               <tr key={index}>
-                <td>{row.order_id}</td>
-                <td>{row.order_date}</td>
-                <td>
-                  Name: {row.customer_info.name}<br/>
-                  Phones: {row.customer_info.phones.join(', ')}<br/>
-                  Address: {row.customer_info.address}<br/>
-                  Email: {row.customer_info.email}
+                <td className="border p-2">{customer.customer_name}</td>
+                <td className="border p-2">
+                  {customer.phone_numbers.map((phone, i) => (
+                    <div key={i}>{phone}</div>
+                  ))}
                 </td>
-                <td>
-                  Items:<br/>
-                  {row.order_details.items.map((item, i) => (
+                <td className="border p-2">
+                  {customer.addresses.map((addr, i) => (
                     <div key={i}>
-                      - {item.name} (x{item.quantity}) ${item.price}
-                      {item.customization && <><br/>&nbsp;&nbsp;Note: {item.customization}</>}
+                      {addr.street}, {addr.city}
                     </div>
                   ))}
-                  <br/>
-                  Instructions: {row.order_details.special_instructions}
                 </td>
-                <td>
-                  ID: {row.server_info.id}<br/>
-                  Name: {row.server_info.name}<br/>
-                  Shift: {row.server_info.shift}<br/>
-                  Section: {row.server_info.section}<br/>
-                  Certs: {row.server_info.certifications}
-                </td>
-                <td>
-                  Methods: {row.payment_info.methods.join(', ')}<br/>
-                  Subtotal: ${row.payment_info.subtotal}<br/>
-                  Tax: ${row.payment_info.tax}<br/>
-                  Tip: ${row.payment_info.tip}<br/>
-                  Loyalty: {row.payment_info.loyalty_points}
+                <td className="border p-2">
+                  {customer.orders.map((order, i) => (
+                    <div key={i} className="mb-2">
+                      Order #{order.order_id}:<br />
+                      Product: {order.product}<br />
+                      Quantity: {order.quantity}<br />
+                      Price: ${order.price}
+                    </div>
+                  ))}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-
-      <style jsx>{`
-        .subheader {
-          font-size: 0.8em;
-          color: #666;
-          font-weight: normal;
-        }
-        .legend {
-          margin: 20px 0;
-          padding: 15px;
-          background: #f8f9fa;
-          border-radius: 5px;
-        }
-        .legend ul {
-          list-style: none;
-          padding-left: 0;
-        }
-        .legend li {
-          margin: 5px 0;
-        }
-      `}</style>
     </div>
   );
 };
