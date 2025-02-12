@@ -7,6 +7,8 @@ import AssignmentsPage from './AssignmentsPage';
 import IndexingLab from './IndexingLab';
 import NormalizationLab from './NormalizationLab/NormalizationLab';
 import './NormalizationLab/NormalizationLab.css';
+import CodingLab from './DSA_playground/CodingLab';
+
 
 // Feature Card Component
 const FeatureCard = ({ icon: Icon, title, description }) => (
@@ -305,6 +307,12 @@ const App = () => {
           ) : (
             <>
               <Link
+                to="/coding"
+                className={`nav-button tab ${locationhook.pathname === '/coding' ? 'active' : ''}`}
+              >
+                DSA Playground
+              </Link>
+              <Link
                 to="/normalization"
                 className={`nav-button tab ${locationhook.pathname === '/normalization' ? 'active' : ''}`}
               >
@@ -351,11 +359,19 @@ const App = () => {
               <Navigate to="/sql" replace />
           } />
           <Route
+            path="/coding"
+            element={
+              <ProtectedRoute>
+                <CodingLab />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/normalization"
             element={
               <ProtectedRoute>
                 <NormalizationLab />
-                <SQLLab/>
+                <SQLLab />
               </ProtectedRoute>
             }
           />
