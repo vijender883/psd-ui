@@ -17,6 +17,32 @@ const CodingLab = () => {
   const [showCelebration, setShowCelebration] = useState(false);
   const [compilationError, setCompilationError] = useState(null);
 
+  const [problem, setProblem] = useState({
+    title: '',
+    description: '',
+    inputFormat: '',
+    outputFormat: '',
+    example: { input: '', output: '' },
+    functionTemplate: ''
+  });
+
+  useEffect(() => {
+    const fetchProblem = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/api/code/problems');
+        const data = await response.json();
+        if (data.length > 0) {
+          setProblem(data[data.length - 1]);
+          setCode(data[data.length - 1].functionTemplate); // Set the initial code template
+        }
+      } catch (error) {
+        console.error('Error fetching problem:', error);
+      }
+    };
+
+    fetchProblem();
+  }, []);
+
 
   const getIndentation = (line) => {
     const match = line.match(/^\s*/);
@@ -172,8 +198,6 @@ const CodingLab = () => {
     }
   };
 
-
-
   // submissions list to show scores:
   submissions.map((submission) => (
     <div key={submission.id} className="submission-item">
@@ -208,7 +232,10 @@ const CodingLab = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         },
-        body: JSON.stringify({ code }),
+        body: JSON.stringify({ 
+          code,
+          problemId: problem.id  // Add the problemId
+        }),
       });
 
       const data = await response.json();
@@ -234,7 +261,6 @@ const CodingLab = () => {
         };
         setSubmissions([newSubmission, ...submissions]);
 
-        // Show celebration for perfect score
         if (score === 100) {
           setShowCelebration(true);
           setTimeout(() => setShowCelebration(false), 3000);
@@ -244,7 +270,7 @@ const CodingLab = () => {
       setShowResults(true);
       console.error('Error submitting code:', error);
     }
-    finally{
+    finally {
       setIsLoading(false);
     }
   };
@@ -278,21 +304,21 @@ const CodingLab = () => {
         {/* Problem Statement Panel */}
         <div className="problem-panel">
           <div className="problem-content">
-            <h2>Find Minimum Element</h2>
+            <h2>{problem.title}</h2>
             <div className="problem-description">
               <h3>Problem Description</h3>
-              <p>Given an array of integers, write a function to find the minimum element in the array.</p>
+              <p>{problem.description}</p>
 
               <h3>Input Format</h3>
-              <p>An array of integers arr where 1 ≤ arr.length ≤ 105</p>
+              <p>{problem.inputFormat}</p>
 
               <h3>Output Format</h3>
-              <p>Return the minimum element in the array</p>
+              <p>{problem.outputFormat}</p>
 
               <h3>Example</h3>
               <pre className="test-case">
-                Input: [64, 34, 25, 12, 22, 11, 90]
-                Output: 11
+                Input: {problem.example.input} <br></br>
+                Output: {problem.example.output}
               </pre>
 
               <div className="test-cases">

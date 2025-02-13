@@ -8,6 +8,12 @@ const AdminProblemManager = () => {
     description: '',
     inputFormat: '',
     outputFormat: '',
+    functionName: 'MinFinder',  // Default function name
+    functionTemplate: `public class MinFinder {
+      public int findMin(int[] arr) {
+          // Write your code here
+      }
+  }`,
     example: {
       input: '',
       output: ''
@@ -18,43 +24,48 @@ const AdminProblemManager = () => {
   const [message, setMessage] = useState(null);
   const [showTestCases, setShowTestCases] = useState(true);
 
-  useEffect(() => {
-    fetchProblemData();
-  }, []);
-
-  const fetchProblemData = async () => {
+  const fetchProblem = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/problem`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        }
-      });
+      const response = await fetch('http://localhost:3001/api/code/problems');
       const data = await response.json();
-      setProblem(data);
+      if (data.length > 0) {
+        setProblem(data[data.length - 1]); // Just getting the first problem for now
+      }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to fetch problem data' });
+      console.error('Error fetching problem:', error);
     }
   };
+
+  useEffect(() => {
+    fetchProblem();
+  }, []);
 
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/problem`, {
+      // Basic validation
+      if (!problem.title || !problem.functionName || !problem.functionTemplate) {
+        setMessage({ type: 'error', text: 'Please fill in all required fields' });
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch('http://localhost:3001/api/code/problem', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(problem)
       });
-      
+
       if (response.ok) {
-        setMessage({ type: 'success', text: 'Problem updated successfully' });
+        setMessage({ type: 'success', text: 'Problem saved successfully!' });
       } else {
-        throw new Error('Failed to update problem');
+        const error = await response.json();
+        setMessage({ type: 'error', text: error.message || 'Failed to save problem' });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: error.message });
+      setMessage({ type: 'error', text: 'Error saving problem: ' + error.message });
     } finally {
       setLoading(false);
     }
@@ -65,7 +76,7 @@ const AdminProblemManager = () => {
       ...prev,
       testCases: [...prev.testCases, {
         input: [],
-        expectedOutput: null,
+        expectedOutput: '',
         description: ''
       }]
     }));
@@ -84,18 +95,46 @@ const AdminProblemManager = () => {
       testCases: prev.testCases.map((testCase, i) => {
         if (i === index) {
           if (field === 'input') {
-            const inputArray = value.split(',').map(num => parseInt(num.trim()));
-            return { ...testCase, input: inputArray };
+            try {
+              // Try to parse as array if it contains commas
+              if (value.includes(',')) {
+                const inputArray = value.split(',').map(item => {
+                  item = item.trim();
+                  // Try to convert to number if possible
+                  const num = Number(item);
+                  return !isNaN(num) ? num : item;
+                });
+                return { ...testCase, input: inputArray };
+              } else {
+                // Single value input
+                const num = Number(value);
+                const input = !isNaN(num) ? num : value;
+                return { ...testCase, input: [input] };
+              }
+            } catch (error) {
+              console.error('Error parsing input:', error);
+              return testCase;
+            }
           }
+
           if (field === 'expectedOutput') {
-            return { ...testCase, expectedOutput: parseInt(value) };
+            try {
+              // Try to convert to number if possible
+              const num = Number(value);
+              const output = !isNaN(num) ? num : value;
+              return { ...testCase, expectedOutput: output };
+            } catch (error) {
+              return { ...testCase, expectedOutput: value };
+            }
           }
+
           return { ...testCase, [field]: value };
         }
         return testCase;
       })
     }));
   };
+
 
   return (
     <div className="admin-problem-container">
@@ -149,6 +188,30 @@ const AdminProblemManager = () => {
             </div>
           </div>
 
+
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>Function Name</label>
+              <input
+                type="text"
+                value={problem.functionName}
+                onChange={(e) => setProblem(prev => ({ ...prev, functionName: e.target.value }))}
+                placeholder="e.g., MinFinder"
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Function Template</label>
+            <textarea
+              value={problem.functionTemplate}
+              onChange={(e) => setProblem(prev => ({ ...prev, functionTemplate: e.target.value }))}
+              placeholder="public class ClassName {..."
+              rows={6}
+            />
+          </div>
+
           <div className="example-section">
             <h3>Example</h3>
             <div className="form-row">
@@ -191,7 +254,7 @@ const AdminProblemManager = () => {
                 {showTestCases ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
               </div>
             </div>
-            
+
             {showTestCases && (
               <div className="test-cases-list">
                 {problem.testCases.map((testCase, index) => (
@@ -202,33 +265,35 @@ const AdminProblemManager = () => {
                     >
                       <Trash2 size={16} />
                     </button>
-                    
+
                     <div className="form-row">
                       <div className="form-group">
                         <label>Input Array</label>
                         <input
                           type="text"
-                          value={testCase.input.join(', ')}
+                          value={Array.isArray(testCase.input) ? testCase.input.join(', ') : testCase.input}
                           onChange={(e) => updateTestCase(index, 'input', e.target.value)}
-                          placeholder="Comma-separated numbers"
+                          placeholder="Values (comma-separated for arrays)"
                         />
                       </div>
                       <div className="form-group">
                         <label>Expected Output</label>
                         <input
                           type="text"
-                          value={testCase.expectedOutput || ''}
+                          value={testCase.expectedOutput}
                           onChange={(e) => updateTestCase(index, 'expectedOutput', e.target.value)}
+                          placeholder="Expected output (any type)"
                         />
                       </div>
                     </div>
-                    
+
                     <div className="form-group">
                       <label>Description</label>
                       <input
                         type="text"
                         value={testCase.description}
                         onChange={(e) => updateTestCase(index, 'description', e.target.value)}
+                        placeholder="Describe this test case"
                       />
                     </div>
                   </div>
