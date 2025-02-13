@@ -3,6 +3,7 @@ import { Clock, Play, Plus, ChevronUp, ChevronDown, CheckCircle, XCircle, X } fr
 import './CodingLab.css';
 import Celebration from './Celebration/Celebration';
 import CalculateScore from './utils/CalculateScore';
+import CompilationError from './utils/CompilationError';
 
 const CodingLab = () => {
   const [code, setCode] = useState('class MinFinder {\n    public int findMin(int[] arr) {\n        // Write your code here\n    }\n}');
@@ -14,6 +15,8 @@ const CodingLab = () => {
   const [newTestCase, setNewTestCase] = useState({ input: '', expectedOutput: '' });
   const [showResults, setShowResults] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [compilationError, setCompilationError] = useState(null);
+
 
   const getIndentation = (line) => {
     const match = line.match(/^\s*/);
@@ -196,6 +199,8 @@ const CodingLab = () => {
 
   const handleSubmit = async () => {
     setIsLoading(true);
+    setCompilationError(null);
+    setShowResults(false);
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/code/submit`, {
         method: 'POST',
@@ -207,6 +212,13 @@ const CodingLab = () => {
       });
 
       const data = await response.json();
+
+      if (data.error && data.error.includes('error: ')) {
+        setCompilationError(data.error);
+        setShowResults(true);
+        return;
+      }
+
       const score = CalculateScore(data);
       setResults(data);
       setShowResults(true);
@@ -229,9 +241,12 @@ const CodingLab = () => {
         }
       }
     } catch (error) {
+      setShowResults(true);
       console.error('Error submitting code:', error);
     }
-    setIsLoading(false);
+    finally{
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -313,7 +328,7 @@ const CodingLab = () => {
           </div>
 
           {/* Results Overlay */}
-          {showResults && results && (
+          {showResults && (
             <div className="results-overlay">
               <button
                 className="close-results"
@@ -321,34 +336,39 @@ const CodingLab = () => {
               >
                 <X size={24} />
               </button>
-              <div className="score-display">
-                Score: {CalculateScore(results)}/100
-              </div>
-              <h3>Test Results</h3>
-              <div className="test-results">
-                {results.results?.map((result, index) => (
-                  <div
-                    key={index}
-                    className={`test-result ${result.passed ? 'passed' : 'failed'}`}
-                  >
-                    <div className="test-result-header">
-                      {result.passed ? (
-                        <CheckCircle className="passed-icon" />
-                      ) : (
-                        <XCircle className="failed-icon" />
-                      )}
-                      <span className="test-case-title">Test Case {result.testCase}</span>
-                    </div>
-                    <p className="test-case-description">{result.description}</p>
-                    <div className="test-result-details">
-                      <p>Input: {result.input}</p>
-                      <p>Expected: {result.expectedOutput}</p>
-                      <p>Your Output: {result.yourOutput}</p>
-                      <p className="execution-time">Time: {result.executionTime.toFixed(2)}ms</p>
-                    </div>
+              {compilationError ? (
+                <CompilationError error={compilationError} />
+              ) : (
+                <>
+                  <div className="score-display">
+                    Score: {CalculateScore(results)}/100
                   </div>
-                ))}
-              </div>
+                  <h3>Test Results</h3>
+                  <div className="test-results">
+                    {results.results?.map((result, index) => (
+                      <div
+                        key={index}
+                        className={`test-result ${result.passed ? 'passed' : 'failed'}`}
+                      >
+                        <div className="test-result-header">
+                          {result.passed ? (
+                            <CheckCircle className="passed-icon" />
+                          ) : (
+                            <XCircle className="failed-icon" />
+                          )}
+                          <span className="test-case-title">Test Case {result.testCase}</span>
+                        </div>
+                        <p className="test-case-description">{result.description}</p>
+                        <div className="test-result-details">
+                          <p>Input: {result.input}</p>
+                          <p>Expected: {result.expectedOutput}</p>
+                          <p>Your Output: {result.yourOutput}</p>
+                          <p className="execution-time">Time: {result.executionTime.toFixed(2)}ms</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>)}
             </div>
           )}
         </div>

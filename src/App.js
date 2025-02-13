@@ -1,25 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
-import { Terminal, BookOpen, Users, Clock } from 'lucide-react';
+import { Terminal } from 'lucide-react';
 import CohortPage from './CohortPage';
 import AssignmentsPage from './AssignmentsPage';
 import IndexingLab from './IndexingLab';
 import NormalizationLab from './NormalizationLab/NormalizationLab';
 import './NormalizationLab/NormalizationLab.css';
 import CodingLab from './DSA_playground/CodingLab';
-
-
-// Feature Card Component
-const FeatureCard = ({ icon: Icon, title, description }) => (
-  <div className="feature-card">
-    <div className="feature-icon">
-      <Icon size={24} />
-    </div>
-    <h3>{title}</h3>
-    <p>{description}</p>
-  </div>
-);
+import SQLLab from './SQLLab';
+import LandingPage from './LandingPage';
+import AdminProblemManager from './Admin/AdminProblemManager';
 
 // Login Modal Component
 const LoginModal = ({ isOpen, onClose, onLogin }) => {
@@ -45,6 +36,7 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
 
       if (data.valid) {
         localStorage.setItem('authToken', token);
+        localStorage.setItem('isAdmin', data.isAdmin);
         onLogin();
         onClose();
       } else {
@@ -86,183 +78,18 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
   );
 };
 
-// SQL Lab Component
-const SQLLab = () => {
-  const [query, setQuery] = useState('');
-  const [result, setResult] = useState(null);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [executedQuery, setExecutedQuery] = useState(null);
-  const navigate = useNavigate();
-
-
-  const handleSubmit = useCallback(async (e) => {
-    if (e) {
-      e.preventDefault();
-    }
-
-    setLoading(true);
-    setError(null);
-    setExecutedQuery(query);
-
-    try {
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        navigate('/');
-        return;
-      }
-
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/execute`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ query }),
-      });
-
-      const data = await response.json();
-
-      if (data.error) {
-        setError(data.error);
-        setResult(null);
-      } else {
-        setResult(data);
-        setError(null);
-      }
-    } catch (err) {
-      setError('Failed to execute query');
-      setResult(null);
-    }
-
-    setLoading(false);
-  }, [query, navigate]);
-
-  useEffect(() => {
-    const handleKeyPress = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && query.trim()) {
-        handleSubmit();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyPress);
-    return () => document.removeEventListener('keydown', handleKeyPress);
-  }, [query, handleSubmit]);
-
-  return (
-    <div className="workspace">
-      {/* <div className="query-section"> */}
-      <form onSubmit={handleSubmit} className="query-form">
-        <textarea
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Enter your SQL query here... (Ctrl + Enter to execute)"
-          className="query-input"
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className={`execute-button ${loading ? 'loading' : ''}`}
-        >
-          {loading ? 'Executing...' : 'Execute Query'}
-        </button>
-      </form>
-
-      {executedQuery && (
-        <div className="executed-query">
-          <h3>Executed Query</h3>
-          <pre>{executedQuery}</pre>
-        </div>
-      )}
-
-      {error && (
-        <div className="error-message">
-          <h3>Error</h3>
-          <p>{error}</p>
-        </div>
-      )}
-      {/* </div> */}
-
-      {result && (
-        <div className="results-section">
-          <div className="results-header">
-            <h2>Query Results</h2>
-            {result.executionTime && (
-              <div className="execution-time">
-                Execution Time: {result.executionTime}
-              </div>
-            )}
-          </div>
-
-          <div className="results-table-wrapper">
-            <table className="results-table">
-              <thead>
-                <tr>
-                  {result.columns?.map((column, i) => (
-                    <th key={i}>{column}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {result.rows?.map((row, i) => (
-                  <tr key={i}>
-                    {Object.values(row).map((value, j) => (
-                      <td key={j}>{value}</td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-// Landing Page Component
-const LandingPage = ({ onLoginClick }) => (
-  <div className="landing-section">
-    <div className="hero">
-      <h1>Master SQL and System Design</h1>
-      <p className="hero-subtitle">Learn practical database skills through hands-on exercises and real-world scenarios</p>
-      <button onClick={onLoginClick} className="cta-button">
-        Start Learning Now
-      </button>
-    </div>
-
-    <div className="features-grid">
-      <FeatureCard
-        icon={BookOpen}
-        title="Practical Learning"
-        description="Learn through hands-on exercises and real-world scenarios"
-      />
-      <FeatureCard
-        icon={Users}
-        title="Cohort-Based"
-        description="Learn alongside peers and get personalized feedback"
-      />
-      <FeatureCard
-        icon={Terminal}
-        title="Interactive SQL"
-        description="Write and execute SQL queries in real-time"
-      />
-      <FeatureCard
-        icon={Clock}
-        title="Self-Paced"
-        description="Learn at your own pace with structured modules"
-      />
-    </div>
-  </div>
-);
-
 // Protected Route Component
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, adminOnly = false }) => {
   const isLoggedIn = localStorage.getItem('authToken') !== null;
-  const locationhook = useLocation();
+  const isAdmin = localStorage.getItem('isAdmin') === 'true';
+  const location = useLocation();
 
   if (!isLoggedIn) {
-    return <Navigate to="/" state={{ from: locationhook }} replace />;
+    return <Navigate to="/" state={{ from: location }} replace />;
+  }
+
+  if (adminOnly && !isAdmin) {
+    return <Navigate to="/" replace />;
   }
 
   return children;
@@ -272,19 +99,24 @@ const ProtectedRoute = ({ children }) => {
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
   const locationhook = useLocation();
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
+    const adminStatus = localStorage.getItem('isAdmin') === 'true';
     if (token) {
       setIsLoggedIn(true);
+      setIsAdmin(adminStatus);
     }
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
+    localStorage.removeItem('isAdmin');
     setIsLoggedIn(false);
+    setIsAdmin(false);
     navigate('/');
   };
 
@@ -306,6 +138,14 @@ const App = () => {
             </button>
           ) : (
             <>
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  className={`nav-button tab ${locationhook.pathname === '/admin' ? 'active' : ''}`}
+                >
+                  Admin
+                </Link>
+              )}
               <Link
                 to="/coding"
                 className={`nav-button tab ${locationhook.pathname === '/coding' ? 'active' : ''}`}
@@ -358,6 +198,14 @@ const App = () => {
               <LandingPage onLoginClick={() => setShowLoginModal(true)} /> :
               <Navigate to="/sql" replace />
           } />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <AdminProblemManager />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/coding"
             element={
