@@ -4,6 +4,14 @@
   height: calc(100vh - 64px);
   background-color: #f3f4f6;
   position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+
+.coding-lab-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
 .split-view {
@@ -279,3 +287,4 @@
     height: 50vh;
   }
 }
+

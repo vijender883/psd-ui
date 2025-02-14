@@ -26,7 +26,7 @@ const AdminProblemManager = () => {
 
   const fetchProblem = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/code/problems');
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/code/problems`);
       const data = await response.json();
       if (data.length > 0) {
         setProblem(data[data.length - 1]); // Just getting the first problem for now
@@ -50,7 +50,7 @@ const AdminProblemManager = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:3001/api/code/problem', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/code/problem`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

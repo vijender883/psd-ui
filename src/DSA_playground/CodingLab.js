@@ -3,7 +3,9 @@ import { Clock, Play, Plus, ChevronUp, ChevronDown, CheckCircle, XCircle, X } fr
 import './CodingLab.css';
 import Celebration from './Celebration/Celebration';
 import CalculateScore from './utils/CalculateScore';
+import ProblemNavigation from './ProblemNav/ProblemNavigation';
 import CompilationError from './utils/CompilationError';
+
 
 const CodingLab = () => {
   const [code, setCode] = useState('class MinFinder {\n    public int findMin(int[] arr) {\n        // Write your code here\n    }\n}');
@@ -26,21 +28,24 @@ const CodingLab = () => {
     functionTemplate: ''
   });
 
+  const [problems, setProblems] = useState([]);
+
   useEffect(() => {
-    const fetchProblem = async () => {
+    const fetchProblems = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/code/problems');
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/code/problems`);
         const data = await response.json();
         if (data.length > 0) {
-          setProblem(data[data.length - 1]);
-          setCode(data[data.length - 1].functionTemplate); // Set the initial code template
+          setProblems(data);
+          setProblem(data[0]); // Set initial problem
+          setCode(data[0].functionTemplate);
         }
       } catch (error) {
-        console.error('Error fetching problem:', error);
+        console.error('Error fetching problems:', error);
       }
     };
 
-    fetchProblem();
+    fetchProblems();
   }, []);
 
 
@@ -232,7 +237,7 @@ const CodingLab = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           code,
           problemId: problem.id  // Add the problemId
         }),
@@ -298,172 +303,190 @@ const CodingLab = () => {
     }
   };
 
+  const handleProblemSelect = (selectedProblem) => {
+    setProblem(selectedProblem);
+    setCode(selectedProblem.functionTemplate);
+    // Reset states for new problem
+    setResults(null);
+    setSubmissions([]);
+    setCustomTestCases([]);
+    setShowResults(false);
+    setCompilationError(null);
+  };
+
   return (
-    <div className="coding-lab-container">
-      <div className="split-view">
-        {/* Problem Statement Panel */}
-        <div className="problem-panel">
-          <div className="problem-content">
-            <h2>{problem.title}</h2>
-            <div className="problem-description">
-              <h3>Problem Description</h3>
-              <p>{problem.description}</p>
+    <div className="coding-lab-wrapper">
+      <ProblemNavigation
+        currentProblem={problem}
+        problems={problems}
+        onSelectProblem={handleProblemSelect}
+      />
+      <div className="coding-lab-container">
+        <div className="split-view">
+          {/* Problem Statement Panel */}
+          <div className="problem-panel">
+            <div className="problem-content">
+              <h2>{problem.title}</h2>
+              <div className="problem-description">
+                <h3>Problem Description</h3>
+                <p>{problem.description}</p>
 
-              <h3>Input Format</h3>
-              <p>{problem.inputFormat}</p>
+                <h3>Input Format</h3>
+                <p>{problem.inputFormat}</p>
 
-              <h3>Output Format</h3>
-              <p>{problem.outputFormat}</p>
+                <h3>Output Format</h3>
+                <p>{problem.outputFormat}</p>
 
-              <h3>Example</h3>
-              <pre className="test-case">
-                Input: {problem.example.input} <br></br>
-                Output: {problem.example.output}
-              </pre>
+                <h3>Example</h3>
+                <pre className="test-case">
+                  Input: {problem.example.input} <br></br>
+                  Output: {problem.example.output}
+                </pre>
 
-              <div className="test-cases">
-                <h3>Custom Test Cases</h3>
-                {customTestCases.map((testCase) => (
-                  <div key={testCase.id} className="test-case">
-                    <p>Input: {testCase.input}</p>
-                    <p>Expected Output: {testCase.expectedOutput}</p>
+                <div className="test-cases">
+                  <h3>Custom Test Cases</h3>
+                  {customTestCases.map((testCase) => (
+                    <div key={testCase.id} className="test-case">
+                      <p>Input: {testCase.input}</p>
+                      <p>Expected Output: {testCase.expectedOutput}</p>
+                    </div>
+                  ))}
+
+                  <div className="test-case-inputs">
+                    <input
+                      type="text"
+                      placeholder="Input (comma-separated)"
+                      value={newTestCase.input}
+                      onChange={(e) => setNewTestCase({ ...newTestCase, input: e.target.value })}
+                      className="test-case-input"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Expected Output"
+                      value={newTestCase.expectedOutput}
+                      onChange={(e) => setNewTestCase({ ...newTestCase, expectedOutput: e.target.value })}
+                      className="test-case-input"
+                    />
+                    <button onClick={addCustomTestCase} className="add-test-case-button">
+                      <Plus size={20} />
+                    </button>
                   </div>
-                ))}
-
-                <div className="test-case-inputs">
-                  <input
-                    type="text"
-                    placeholder="Input (comma-separated)"
-                    value={newTestCase.input}
-                    onChange={(e) => setNewTestCase({ ...newTestCase, input: e.target.value })}
-                    className="test-case-input"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Expected Output"
-                    value={newTestCase.expectedOutput}
-                    onChange={(e) => setNewTestCase({ ...newTestCase, expectedOutput: e.target.value })}
-                    className="test-case-input"
-                  />
-                  <button onClick={addCustomTestCase} className="add-test-case-button">
-                    <Plus size={20} />
-                  </button>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Results Overlay */}
-          {showResults && (
-            <div className="results-overlay">
-              <button
-                className="close-results"
-                onClick={() => setShowResults(false)}
-              >
-                <X size={24} />
-              </button>
-              {compilationError ? (
-                <CompilationError error={compilationError} />
-              ) : (
-                <>
-                  <div className="score-display">
-                    Score: {CalculateScore(results)}/100
-                  </div>
-                  <h3>Test Results</h3>
-                  <div className="test-results">
-                    {results.results?.map((result, index) => (
-                      <div
-                        key={index}
-                        className={`test-result ${result.passed ? 'passed' : 'failed'}`}
-                      >
-                        <div className="test-result-header">
-                          {result.passed ? (
-                            <CheckCircle className="passed-icon" />
-                          ) : (
-                            <XCircle className="failed-icon" />
-                          )}
-                          <span className="test-case-title">Test Case {result.testCase}</span>
-                        </div>
-                        <p className="test-case-description">{result.description}</p>
-                        <div className="test-result-details">
-                          <p>Input: {result.input}</p>
-                          <p>Expected: {result.expectedOutput}</p>
-                          <p>Your Output: {result.yourOutput}</p>
-                          <p className="execution-time">Time: {result.executionTime.toFixed(2)}ms</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </>)}
-            </div>
-          )}
-        </div>
-
-        {/* Code Editor Panel */}
-        <div className="editor-panel">
-          <div className="code-editor">
-            <textarea
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              onKeyDown={handleKeyDown}
-              spellCheck="false"
-            />
-          </div>
-
-          <div className="submit-button-container">
-            <button
-              onClick={handleSubmit}
-              disabled={isLoading}
-              className="submit-button"
-            >
-              {isLoading ? (
-                <>
-                  <Clock className="animate-spin" />
-                  <span>Running...</span>
-                </>
-              ) : (
-                <>
-                  <Play />
-                  <span>Submit (Ctrl+Enter)</span>
-                </>
-              )}
-            </button>
-          </div>
-
-          <div className="submissions-panel">
-            <button
-              onClick={() => setShowSubmissions(!showSubmissions)}
-              className="submissions-toggle"
-            >
-              <span>Previous Submissions</span>
-              {showSubmissions ? <ChevronDown /> : <ChevronUp />}
-            </button>
-            {showSubmissions && (
-              <div className="submissions-list">
-                {submissions.map((submission) => (
-                  <div key={submission.id} className="submission-item">
-                    <div className="submission-header">
-                      <span className="submission-id">#{submission.id}</span>
-                      <span className="submission-time">
-                        {new Date(submission.timestamp).toLocaleString()}
-                      </span>
+            {/* Results Overlay */}
+            {showResults && (
+              <div className="results-overlay">
+                <button
+                  className="close-results"
+                  onClick={() => setShowResults(false)}
+                >
+                  <X size={24} />
+                </button>
+                {compilationError ? (
+                  <CompilationError error={compilationError} />
+                ) : (
+                  <>
+                    <div className="score-display">
+                      Score: {CalculateScore(results)}/100
                     </div>
-                    <div className="submission-info">
-                      <span className="test-stats">
-                        {submission.passedTests}/{submission.totalTests} tests passed
-                      </span>
-                      <span className="execution-time">
-                        {submission.executionTime.toFixed(2)}ms
-                      </span>
+                    <h3>Test Results</h3>
+                    <div className="test-results">
+                      {results.results?.map((result, index) => (
+                        <div
+                          key={index}
+                          className={`test-result ${result.passed ? 'passed' : 'failed'}`}
+                        >
+                          <div className="test-result-header">
+                            {result.passed ? (
+                              <CheckCircle className="passed-icon" />
+                            ) : (
+                              <XCircle className="failed-icon" />
+                            )}
+                            <span className="test-case-title">Test Case {result.testCase}</span>
+                          </div>
+                          <p className="test-case-description">{result.description}</p>
+                          <div className="test-result-details">
+                            <p>Input: {result.input}</p>
+                            <p>Expected: {result.expectedOutput}</p>
+                            <p>Your Output: {result.yourOutput}</p>
+                            <p className="execution-time">Time: {result.executionTime.toFixed(2)}ms</p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  </div>
-                ))}
+                  </>)}
               </div>
             )}
           </div>
+
+          {/* Code Editor Panel */}
+          <div className="editor-panel">
+            <div className="code-editor">
+              <textarea
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                onKeyDown={handleKeyDown}
+                spellCheck="false"
+              />
+            </div>
+
+            <div className="submit-button-container">
+              <button
+                onClick={handleSubmit}
+                disabled={isLoading}
+                className="submit-button"
+              >
+                {isLoading ? (
+                  <>
+                    <Clock className="animate-spin" />
+                    <span>Running...</span>
+                  </>
+                ) : (
+                  <>
+                    <Play />
+                    <span>Submit (Ctrl+Enter)</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            <div className="submissions-panel">
+              <button
+                onClick={() => setShowSubmissions(!showSubmissions)}
+                className="submissions-toggle"
+              >
+                <span>Previous Submissions</span>
+                {showSubmissions ? <ChevronDown /> : <ChevronUp />}
+              </button>
+              {showSubmissions && (
+                <div className="submissions-list">
+                  {submissions.map((submission) => (
+                    <div key={submission.id} className="submission-item">
+                      <div className="submission-header">
+                        <span className="submission-id">#{submission.id}</span>
+                        <span className="submission-time">
+                          {new Date(submission.timestamp).toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="submission-info">
+                        <span className="test-stats">
+                          {submission.passedTests}/{submission.totalTests} tests passed
+                        </span>
+                        <span className="execution-time">
+                          {submission.executionTime.toFixed(2)}ms
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
+        {showCelebration && <Celebration />}
       </div>
-      {showCelebration && <Celebration />}
     </div>
   );
 };
