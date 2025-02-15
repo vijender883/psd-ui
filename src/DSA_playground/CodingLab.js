@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Play, Plus, ChevronUp, ChevronDown, CheckCircle, XCircle, X , Eye} from 'lucide-react';
+import { Clock, Play, Plus, ChevronUp, ChevronDown, CheckCircle, XCircle, X, Eye } from 'lucide-react';
 import './CodingLab.css';
 import Celebration from './Celebration/Celebration';
 import CalculateScore from './utils/CalculateScore';
 import ProblemNavigation from './ProblemNav/ProblemNavigation';
-import CompilationError from './utils/CompilationError';
+import MonacoCodeEditor from './CodeEditor/MonacoCodeEditor';
+import ErrorDisplay from './ErrorDisplay/ErrorDisplay';
 
 
 const CodingLab = () => {
@@ -46,7 +47,7 @@ const CodingLab = () => {
             <span>{showingSolution ? 'Hide Solution' : 'View Solution'}</span>
           </button>
         </div>
-        
+
         {showingSolution && (
           <div className="solution-content">
             <div className="solution-explanation">
@@ -279,8 +280,17 @@ const CodingLab = () => {
 
       const data = await response.json();
 
-      if (data.error && data.error.includes('error: ')) {
+      if (data.error && data.error.includes('error:')) {
         setCompilationError(data.error);
+        setShowResults(true);
+        return;
+      }
+
+      if (data.error) {
+        setCompilationError({
+          message: data.error,
+          stack: data.stack
+        });
         setShowResults(true);
         return;
       }
@@ -307,6 +317,10 @@ const CodingLab = () => {
       }
     } catch (error) {
       setShowResults(true);
+      setCompilationError({
+        message: 'An error occurred while running your code',
+        stack: error.message
+      });
       console.error('Error submitting code:', error);
     }
     finally {
@@ -377,35 +391,6 @@ const CodingLab = () => {
                   Output: {problem.example.output}
                 </pre>
 
-                <div className="test-cases">
-                  <h3>Custom Test Cases</h3>
-                  {customTestCases.map((testCase) => (
-                    <div key={testCase.id} className="test-case">
-                      <p>Input: {testCase.input}</p>
-                      <p>Expected Output: {testCase.expectedOutput}</p>
-                    </div>
-                  ))}
-
-                  <div className="test-case-inputs">
-                    <input
-                      type="text"
-                      placeholder="Input (comma-separated)"
-                      value={newTestCase.input}
-                      onChange={(e) => setNewTestCase({ ...newTestCase, input: e.target.value })}
-                      className="test-case-input"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Expected Output"
-                      value={newTestCase.expectedOutput}
-                      onChange={(e) => setNewTestCase({ ...newTestCase, expectedOutput: e.target.value })}
-                      className="test-case-input"
-                    />
-                    <button onClick={addCustomTestCase} className="add-test-case-button">
-                      <Plus size={20} />
-                    </button>
-                  </div>
-                </div>
               </div>
 
               {renderSolutionSection()}
@@ -421,7 +406,7 @@ const CodingLab = () => {
                   <X size={24} />
                 </button>
                 {compilationError ? (
-                  <CompilationError error={compilationError} />
+                  <ErrorDisplay error={compilationError} />
                 ) : (
                   <>
                     <div className="score-display">
@@ -452,7 +437,8 @@ const CodingLab = () => {
                         </div>
                       ))}
                     </div>
-                  </>)}
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -460,11 +446,11 @@ const CodingLab = () => {
           {/* Code Editor Panel */}
           <div className="editor-panel">
             <div className="code-editor">
-              <textarea
+              <MonacoCodeEditor
                 value={code}
-                onChange={(e) => setCode(e.target.value)}
-                onKeyDown={handleKeyDown}
-                spellCheck="false"
+                onChange={(newValue) => setCode(newValue)}
+                language="java"
+                onSubmit={handleSubmit}
               />
             </div>
 
