@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Play, Plus, ChevronUp, ChevronDown, CheckCircle, XCircle, X } from 'lucide-react';
+import { Clock, Play, Plus, ChevronUp, ChevronDown, CheckCircle, XCircle, X , Eye} from 'lucide-react';
 import './CodingLab.css';
 import Celebration from './Celebration/Celebration';
 import CalculateScore from './utils/CalculateScore';
@@ -29,6 +29,39 @@ const CodingLab = () => {
   });
 
   const [problems, setProblems] = useState([]);
+  const [showingSolution, setShowingSolution] = useState(false);
+
+  const renderSolutionSection = () => {
+    if (!problem.showSolution) return null;
+
+    return (
+      <div className="solution-section">
+        <div className="solution-header">
+          <h3>Solution</h3>
+          <button
+            className="solution-toggle"
+            onClick={() => setShowingSolution(!showingSolution)}
+          >
+            <Eye size={16} />
+            <span>{showingSolution ? 'Hide Solution' : 'View Solution'}</span>
+          </button>
+        </div>
+        
+        {showingSolution && (
+          <div className="solution-content">
+            <div className="solution-explanation">
+              <p>Here's an efficient solution to this problem:</p>
+            </div>
+            <div className="solution-code-container">
+              <pre className="solution-code">
+                <code>{problem.solution}</code>
+              </pre>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   useEffect(() => {
     const fetchProblems = async () => {
@@ -191,6 +224,7 @@ const CodingLab = () => {
         return;
       }
     }
+
 
     // Handle closing bracket/quote skip
     if (Object.values(MATCHING_BRACKETS).includes(e.key)) {
@@ -373,6 +407,8 @@ const CodingLab = () => {
                   </div>
                 </div>
               </div>
+
+              {renderSolutionSection()}
             </div>
 
             {/* Results Overlay */}

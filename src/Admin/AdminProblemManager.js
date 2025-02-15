@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Save, Trash2, AlertCircle, CheckCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Save, Trash2, AlertCircle, CheckCircle, ChevronDown, ChevronUp, List, Edit2 } from 'lucide-react';
 import './AdminProblemManager.css';
 
 const AdminProblemManager = () => {
+  const [problems, setProblems] = useState([]);
+  const [selectedProblem, setSelectedProblem] = useState(null);
+  const [showProblemList, setShowProblemList] = useState(false);
   const [problem, setProblem] = useState({
     title: '',
     description: '',
@@ -18,57 +21,161 @@ const AdminProblemManager = () => {
       input: '',
       output: ''
     },
-    testCases: []
+    testCases: [],
+    showSolution: false,
+    solution: '',
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [showTestCases, setShowTestCases] = useState(true);
 
-  const fetchProblem = async () => {
+  const fetchProblems = async () => {
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/code/problems`);
       const data = await response.json();
-      if (data.length > 0) {
-        setProblem(data[data.length - 1]); // Just getting the first problem for now
-      }
+      setProblems(data);
     } catch (error) {
-      console.error('Error fetching problem:', error);
+      console.error('Error fetching problems:', error);
+      setMessage({ type: 'error', text: 'Error fetching problems' });
     }
   };
 
   useEffect(() => {
-    fetchProblem();
+    fetchProblems();
   }, []);
 
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      // Basic validation
+      // Validate required fields
       if (!problem.title || !problem.functionName || !problem.functionTemplate) {
         setMessage({ type: 'error', text: 'Please fill in all required fields' });
         setLoading(false);
         return;
       }
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/code/problem`, {
-        method: 'POST',
+      const url = selectedProblem
+        ? `${process.env.REACT_APP_API_URL}/api/code/problem/${selectedProblem.id}`
+        : `${process.env.REACT_APP_API_URL}/api/code/problem`;
+
+      const method = selectedProblem ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(problem)
       });
 
-      if (response.ok) {
-        setMessage({ type: 'success', text: 'Problem saved successfully!' });
-      } else {
-        const error = await response.json();
-        setMessage({ type: 'error', text: error.message || 'Failed to save problem' });
+      // Check if response is OK and has content
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorMessage;
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorMessage = errorJson.error || errorJson.message;
+        } catch (e) {
+          errorMessage = errorText;
+        }
+        throw new Error(errorMessage || `Failed to ${selectedProblem ? 'update' : 'save'} problem`);
+      }
+
+      const data = await response.json();
+
+      setMessage({ type: 'success', text: `Problem ${selectedProblem ? 'updated' : 'saved'} successfully!` });
+      await fetchProblems();
+
+      if (!selectedProblem) {
+        resetForm();
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Error saving problem: ' + error.message });
+      console.error('Submit error:', error);
+      setMessage({
+        type: 'error',
+        text: `Error ${selectedProblem ? 'updating' : 'saving'} problem: ${error.message}`
+      });
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDelete = async (problemId) => {
+    if (!window.confirm('Are you sure you want to delete this problem?')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/code/problem/${problemId}`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        // First try to get the response as text
+        const responseText = await response.text();
+        
+        let data;
+        try {
+            // Try to parse the response as JSON
+            data = JSON.parse(responseText);
+        } catch (e) {
+            console.error('Failed to parse response as JSON:', responseText);
+            throw new Error('Server returned invalid JSON');
+        }
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to delete problem');
+        }
+
+        setMessage({ 
+            type: 'success', 
+            text: data.message || 'Problem deleted successfully!' 
+        });
+        
+        await fetchProblems();
+        
+        if (selectedProblem?.id === problemId) {
+            resetForm();
+        }
+    } catch (error) {
+        console.error('Delete error:', error);
+        setMessage({ 
+            type: 'error', 
+            text: `Error deleting problem: ${error.message}` 
+        });
+    }
+};
+
+  const resetForm = () => {
+    setProblem({
+      title: '',
+      description: '',
+      inputFormat: '',
+      outputFormat: '',
+      functionName: 'MinFinder',
+      functionTemplate: `public class MinFinder {
+        public int findMin(int[] arr) {
+            // Write your code here
+        }
+    }`,
+      example: {
+        input: '',
+        output: ''
+      },
+      testCases: [],
+      showSolution: false,
+      solution: '',
+    });
+    setSelectedProblem(null);
+  };
+
+  const selectProblem = (problem) => {
+    setSelectedProblem(problem);
+    setProblem(problem);
+    setShowProblemList(false);
   };
 
   const addTestCase = () => {
@@ -139,7 +246,51 @@ const AdminProblemManager = () => {
   return (
     <div className="admin-problem-container">
       <div className="admin-content">
-        <h1>Problem Management</h1>
+        <div className="admin-header">
+          <h1>Problem Management</h1>
+          <div className="header-actions">
+            <button
+              className="list-button"
+              onClick={() => setShowProblemList(!showProblemList)}
+            >
+              <List size={16} />
+              Problem List
+            </button>
+            <button
+              className="new-button"
+              onClick={resetForm}
+            >
+              <Plus size={16} />
+              New Problem
+            </button>
+          </div>
+        </div>
+
+        {showProblemList && (
+          <div className="problems-list">
+            {problems.map((p) => (
+              <div key={p.id} className="problem-list-item">
+                <span className="problem-title">{p.title}</span>
+                <div className="problem-actions">
+                  <button
+                    className="edit-button"
+                    onClick={() => selectProblem(p)}
+                  >
+                    <Edit2 size={16} />
+                    Edit
+                  </button>
+                  <button
+                    className="delete-button"
+                    onClick={() => handleDelete(p.id)}
+                  >
+                    <Trash2 size={16} />
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {message && (
           <div className={`message ${message.type}`}>
@@ -151,6 +302,34 @@ const AdminProblemManager = () => {
             <span>{message.text}</span>
           </div>
         )}
+
+        <div className="form-group">
+          <label>Solution Management</label>
+          <div className="solution-controls">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={problem.showSolution}
+                onChange={(e) => setProblem(prev => ({
+                  ...prev,
+                  showSolution: e.target.checked
+                }))}
+              />
+              Show Solution to Users
+            </label>
+          </div>
+          <textarea
+            value={problem.solution}
+            onChange={(e) => setProblem(prev => ({
+              ...prev,
+              solution: e.target.value
+            }))}
+            placeholder="Enter the solution code here..."
+            rows={8}
+            className="solution-editor"
+          />
+        </div>
+
 
         <div className="form-section">
           <div className="form-group">

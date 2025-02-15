@@ -3,9 +3,11 @@ const CalculateScore = (results) => {
 
   const totalTests = results.results.length;
   if (totalTests === 0) return 0;
+  if(totalTests === 1 && results.results[0].passed) return 100;
 
   const remainingPoints = 85;
   const pointsPerRemainingTest = totalTests > 2 ? remainingPoints / (totalTests - 2) : 0;
+
 
   let totalScore = 0;
   results.results.forEach((result, index) => {
@@ -20,7 +22,7 @@ const CalculateScore = (results) => {
     }
   });
 
-  return totalTests <= 2 ? (Math.round(totalScore) === 20 ? 100 : 0) : Math.round(totalScore);
+  return totalTests === 2 ? (Math.round(totalScore) === 15 ? 100 : 0) : Math.round(totalScore);
 };
 
 export default CalculateScore;

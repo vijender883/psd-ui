@@ -21,28 +21,6 @@
   color: #333;
 }
 
-.message {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin: 1rem;
-  padding: 0.75rem;
-  border-radius: 4px;
-  font-size: 0.875rem;
-}
-
-.message.error {
-  background-color: #fee2e2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
-}
-
-.message.success {
-  background-color: #dcfce7;
-  color: #16a34a;
-  border: 1px solid #bbf7d0;
-}
-
 .form-section {
   padding: 1.5rem;
 }
@@ -109,12 +87,6 @@
   align-items: center;
   cursor: pointer;
   padding-bottom: 1rem;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
 }
 
 .test-case {
@@ -211,4 +183,151 @@
 .test-cases-header:hover {
   background-color: #f3f4f6;
   border-radius: 4px;
+}
+
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.list-button,
+.new-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.list-button {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.new-button {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.list-button:hover {
+  background-color: #e0e0e0;
+}
+
+.new-button:hover {
+  background-color: #45a049;
+}
+
+.problems-list {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.problem-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.problem-list-item:last-child {
+  border-bottom: none;
+}
+
+.problem-title {
+  font-weight: 500;
+}
+
+.problem-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.edit-button,
+.delete-button {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: background-color 0.2s;
+}
+
+.edit-button {
+  background-color: #007bff;
+  color: white;
+}
+
+.delete-button {
+  background-color: #dc3545;
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #0056b3;
+}
+
+.delete-button:hover {
+  background-color: #c82333;
+}
+
+.message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.message.success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.save-button {
+  background-color: #007bff;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+
+.save-button:hover {
+  background-color: #0056b3;
+}
+
+.save-button.loading {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
