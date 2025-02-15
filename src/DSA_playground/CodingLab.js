@@ -274,22 +274,17 @@ const CodingLab = () => {
         },
         body: JSON.stringify({
           code,
-          problemId: problem.id  // Add the problemId
+          problemId: problem.id
         }),
       });
 
       const data = await response.json();
 
-      if (data.error && data.error.includes('error:')) {
+      if (!data.success) {
         setCompilationError(data.error);
-        setShowResults(true);
-        return;
-      }
-
-      if (data.error) {
-        setCompilationError({
-          message: data.error,
-          stack: data.stack
+        setResults({
+          results: [],
+          error: data.error
         });
         setShowResults(true);
         return;
@@ -299,21 +294,25 @@ const CodingLab = () => {
       setResults(data);
       setShowResults(true);
 
-      if (data.success) {
-        const newSubmission = {
-          id: submissions.length + 1,
-          timestamp: new Date().toISOString(),
-          executionTime: data.summary.averageExecutionTime,
-          passedTests: data.summary.passedTests,
-          totalTests: data.summary.totalTests,
-          score: score
-        };
-        setSubmissions([newSubmission, ...submissions]);
+      // Calculate summary from results array
+      const totalTests = data.results.length;
+      const passedTests = data.results.filter(result => result.passed).length;
+      const averageExecutionTime = data.results.reduce((sum, result) => sum + result.executionTime, 0) / totalTests;
 
-        if (score === 100) {
-          setShowCelebration(true);
-          setTimeout(() => setShowCelebration(false), 3000);
-        }
+      const newSubmission = {
+        id: submissions.length + 1,
+        timestamp: new Date().toISOString(),
+        executionTime: averageExecutionTime,
+        passedTests: passedTests,
+        totalTests: totalTests,
+        score: score
+      };
+
+      setSubmissions([newSubmission, ...submissions]);
+
+      if (score === 100) {
+        setShowCelebration(true);
+        setTimeout(() => setShowCelebration(false), 3000);
       }
     } catch (error) {
       setShowResults(true);
@@ -340,16 +339,6 @@ const CodingLab = () => {
     return () => document.removeEventListener('keydown', handleKeyPress);
   }, [isLoading]);
 
-
-  const addCustomTestCase = () => {
-    if (newTestCase.input && newTestCase.expectedOutput) {
-      setCustomTestCases([...customTestCases, {
-        id: customTestCases.length + 1,
-        ...newTestCase
-      }]);
-      setNewTestCase({ input: '', expectedOutput: '' });
-    }
-  };
 
   const handleProblemSelect = (selectedProblem) => {
     setProblem(selectedProblem);
@@ -397,6 +386,7 @@ const CodingLab = () => {
             </div>
 
             {/* Results Overlay */}
+
             {showResults && (
               <div className="results-overlay">
                 <button
@@ -406,15 +396,18 @@ const CodingLab = () => {
                   <X size={24} />
                 </button>
                 {compilationError ? (
-                  <ErrorDisplay error={compilationError} />
+                  <div className="compilation-error-container">
+                    <ErrorDisplay error={compilationError} />
+                  </div>
                 ) : (
                   <>
                     <div className="score-display">
                       Score: {CalculateScore(results)}/100
                     </div>
                     <h3>Test Results</h3>
+                  </>)}
                     <div className="test-results">
-                      {results.results?.map((result, index) => (
+                      {results?.results?.map((result, index) => (
                         <div
                           key={index}
                           className={`test-result ${result.passed ? 'passed' : 'failed'}`}
@@ -431,14 +424,23 @@ const CodingLab = () => {
                           <div className="test-result-details">
                             <p>Input: {result.input}</p>
                             <p>Expected: {result.expectedOutput}</p>
-                            <p>Your Output: {result.yourOutput}</p>
-                            <p className="execution-time">Time: {result.executionTime.toFixed(2)}ms</p>
+                            {result.error ? (
+                              <div className="test-case-error">
+                                <ErrorDisplay error={result.error} isTestCase={true} />
+                              </div>
+                            ) : (
+                              <>
+                                <p>Your Output: {result.yourOutput}</p>
+                                <p className="execution-time">
+                                  Time: {result.executionTime.toFixed(2)}ms
+                                </p>
+                              </>
+                            )}
                           </div>
                         </div>
                       ))}
                     </div>
-                  </>
-                )}
+
               </div>
             )}
           </div>

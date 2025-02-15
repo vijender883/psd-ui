@@ -1,4 +1,5 @@
 /* Error Display Styles */
+/* Add these styles to your CSS */
 .error-display {
   background-color: #fef2f2;
   border: 1px solid #fecaca;
@@ -16,20 +17,39 @@
   margin-bottom: 0.75rem;
 }
 
-.error-icon {
-  color: #dc2626;
-}
-
 .error-content {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 0.875rem;
   line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-word;
+  color: #991b1b;
 }
 
 .error-line {
   padding: 0.25rem 0;
+  padding: 0.25rem 0;
+}
+
+.error-highlight {
+  color: #dc2626;
+  font-weight: 500;
+}
+
+.test-case-error {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background-color: #fee2e2;
+  border-radius: 0.375rem;
+}
+
+.test-case-error .error-content {
+  font-size: 0.8125rem;
+}
+
+
+.error-icon {
+  color: #dc2626;
 }
 
 .error-highlight {
@@ -61,4 +81,45 @@
   color: #4b5563;
   max-height: 200px;
   overflow-y: auto;
+}
+
+/* Add to ErrorDisplay.css */
+
+.test-case-error-display {
+  background-color: #fef2f2;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.test-case-error {
+  margin-top: 0.5rem;
+}
+
+.test-case-error .error-message {
+  color: #dc2626;
+  font-size: 0.875rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.test-case-error .error-line {
+  padding: 0.25rem 0;
+  font-size: 0.875rem;
+}
+
+.test-case-error .error-highlight {
+  color: #dc2626;
+  font-weight: 500;
+}
+
+.test-result.failed .test-case-error-display {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+}
+
+.test-result.passed + .test-result.failed {
+  margin-top: 1rem;
+  border-top: 2px solid #fecaca;
+  padding-top: 1rem;
 }
