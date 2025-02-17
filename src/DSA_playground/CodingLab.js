@@ -327,17 +327,17 @@ const CodingLab = () => {
     }
   };
 
-  useEffect(() => {
-    const handleKeyPress = (e) => {
-      // Check for Ctrl+Enter or Cmd+Enter
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && !isLoading) {
-        handleSubmit();
-      }
-    };
+  // useEffect(() => {
+  //   const handleKeyPress = (e) => {
+  //     // Check for Ctrl+Enter or Cmd+Enter
+  //     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && !isLoading) {
+  //       handleSubmit();
+  //     }
+  //   };
 
-    document.addEventListener('keydown', handleKeyPress);
-    return () => document.removeEventListener('keydown', handleKeyPress);
-  }, [isLoading]);
+  //   document.addEventListener('keydown', handleKeyPress);
+  //   return () => document.removeEventListener('keydown', handleKeyPress);
+  // }, [isLoading]);
 
 
   const handleProblemSelect = (selectedProblem) => {
