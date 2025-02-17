@@ -11,7 +11,8 @@ const AdminProblemManager = () => {
     description: '',
     inputFormat: '',
     outputFormat: '',
-    functionName: 'MinFinder',  // Default function name
+    constraints: [], // Add this new field
+    functionName: 'MinFinder',
     functionTemplate: `public class MinFinder {
       public int findMin(int[] arr) {
           // Write your code here
@@ -102,52 +103,52 @@ const AdminProblemManager = () => {
 
   const handleDelete = async (problemId) => {
     if (!window.confirm('Are you sure you want to delete this problem?')) {
-        return;
+      return;
     }
 
     try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/code/problem/${problemId}`, {
-            method: 'DELETE',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        });
-
-        // First try to get the response as text
-        const responseText = await response.text();
-        
-        let data;
-        try {
-            // Try to parse the response as JSON
-            data = JSON.parse(responseText);
-        } catch (e) {
-            console.error('Failed to parse response as JSON:', responseText);
-            throw new Error('Server returned invalid JSON');
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/code/problem/${problemId}`, {
+        method: 'DELETE',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
         }
+      });
 
-        if (!response.ok) {
-            throw new Error(data.error || 'Failed to delete problem');
-        }
+      // First try to get the response as text
+      const responseText = await response.text();
 
-        setMessage({ 
-            type: 'success', 
-            text: data.message || 'Problem deleted successfully!' 
-        });
-        
-        await fetchProblems();
-        
-        if (selectedProblem?.id === problemId) {
-            resetForm();
-        }
+      let data;
+      try {
+        // Try to parse the response as JSON
+        data = JSON.parse(responseText);
+      } catch (e) {
+        console.error('Failed to parse response as JSON:', responseText);
+        throw new Error('Server returned invalid JSON');
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to delete problem');
+      }
+
+      setMessage({
+        type: 'success',
+        text: data.message || 'Problem deleted successfully!'
+      });
+
+      await fetchProblems();
+
+      if (selectedProblem?.id === problemId) {
+        resetForm();
+      }
     } catch (error) {
-        console.error('Delete error:', error);
-        setMessage({ 
-            type: 'error', 
-            text: `Error deleting problem: ${error.message}` 
-        });
+      console.error('Delete error:', error);
+      setMessage({
+        type: 'error',
+        text: `Error deleting problem: ${error.message}`
+      });
     }
-};
+  };
 
   const resetForm = () => {
     setProblem({
@@ -155,12 +156,13 @@ const AdminProblemManager = () => {
       description: '',
       inputFormat: '',
       outputFormat: '',
+      constraints: [], // Reset to empty array
       functionName: 'MinFinder',
       functionTemplate: `public class MinFinder {
-        public int findMin(int[] arr) {
-            // Write your code here
-        }
-    }`,
+      public int findMin(int[] arr) {
+          // Write your code here
+      }
+  }`,
       example: {
         input: '',
         output: ''
@@ -174,7 +176,10 @@ const AdminProblemManager = () => {
 
   const selectProblem = (problem) => {
     setSelectedProblem(problem);
-    setProblem(problem);
+    setProblem({
+      ...problem,
+      constraints: problem.constraints || [], // Ensure constraints exists
+    });
     setShowProblemList(false);
   };
 
@@ -188,6 +193,60 @@ const AdminProblemManager = () => {
       }]
     }));
   };
+
+  const ConstraintsSection = () => {
+    const [newConstraint, setNewConstraint] = useState('');
+  
+    const addConstraint = () => {
+      if (newConstraint.trim()) {
+        setProblem(prev => ({
+          ...prev,
+          constraints: [...(prev.constraints || []), newConstraint.trim()]
+        }));
+        setNewConstraint('');
+      }
+    };
+  
+    const removeConstraint = (index) => {
+      setProblem(prev => ({
+        ...prev,
+        constraints: (prev.constraints || []).filter((_, i) => i !== index)
+      }));
+    };
+  
+    return (
+      <div className="constraints-section">
+        <h3>Constraints</h3>
+        <div className="constraints-input">
+          <input
+            type="text"
+            value={newConstraint}
+            onChange={(e) => setNewConstraint(e.target.value)}
+            placeholder="Add a new constraint (e.g., 1 ≤ n ≤ 10^5)"
+            onKeyPress={(e) => e.key === 'Enter' && addConstraint()}
+          />
+          <button className="add-button" onClick={addConstraint}>
+            <Plus size={16} />
+            Add
+          </button>
+        </div>
+        <div className="constraints-list">
+          {(problem.constraints || []).map((constraint, index) => (
+            <div key={index} className="constraint-item">
+              <span>{constraint}</span>
+              <button
+                className="remove-button"
+                onClick={() => removeConstraint(index)}
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+  
 
   const removeTestCase = (index) => {
     setProblem(prev => ({
@@ -418,6 +477,8 @@ const AdminProblemManager = () => {
               </div>
             </div>
           </div>
+
+          <ConstraintsSection />
 
           <div className="test-cases-section">
             <div className="test-cases-header" onClick={() => setShowTestCases(!showTestCases)}>

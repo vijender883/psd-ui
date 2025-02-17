@@ -82,162 +82,6 @@ const CodingLab = () => {
     fetchProblems();
   }, []);
 
-
-  const getIndentation = (line) => {
-    const match = line.match(/^\s*/);
-    return match ? match[0] : '';
-  };
-
-  const MATCHING_BRACKETS = {
-    '(': ')',
-    '{': '}',
-    '[': ']',
-    '"': '"',
-    "'": "'",
-    '`': '`'
-  };
-
-  const AUTO_CLOSE_CHARS = Object.keys(MATCHING_BRACKETS);
-
-  const handleKeyDown = (e) => {
-    const textarea = e.target;
-    const { value, selectionStart, selectionEnd } = textarea;
-
-    // Handle Tab key
-    if (e.key === 'Tab') {
-      e.preventDefault();
-
-      // Insert tab at cursor position or for selected text
-      const before = value.substring(0, selectionStart);
-      const after = value.substring(selectionEnd);
-      const spaces = '    '; // 4 spaces for tab
-
-      // If there's selected text, indent/unindent multiple lines
-      if (selectionStart !== selectionEnd) {
-        const selectedText = value.substring(selectionStart, selectionEnd);
-        const lines = selectedText.split('\n');
-
-        if (e.shiftKey) {
-          // Unindent
-          const modifiedLines = lines.map(line => {
-            if (line.startsWith('    ')) return line.substring(4);
-            if (line.startsWith('\t')) return line.substring(1);
-            return line;
-          });
-          const newText = modifiedLines.join('\n');
-          textarea.value = before + newText + after;
-          textarea.selectionStart = selectionStart;
-          textarea.selectionEnd = selectionStart + newText.length;
-        } else {
-          // Indent
-          const modifiedLines = lines.map(line => spaces + line);
-          const newText = modifiedLines.join('\n');
-          textarea.value = before + newText + after;
-          textarea.selectionStart = selectionStart;
-          textarea.selectionEnd = selectionStart + newText.length;
-        }
-      } else {
-        // No selection, just insert tab at cursor
-        textarea.value = before + spaces + after;
-        textarea.selectionStart = textarea.selectionEnd = selectionStart + spaces.length;
-      }
-
-      setCode(textarea.value);
-      return;
-    }
-
-    // Handle Enter key for auto-indentation
-    if (e.key === 'Enter') {
-      e.preventDefault();
-
-      const lines = value.substring(0, selectionStart).split('\n');
-      const currentLine = lines[lines.length - 1];
-      const indentation = getIndentation(currentLine);
-
-      // Add extra indentation if the line ends with an opening brace
-      const extraIndent = currentLine.trimEnd().endsWith('{') ? '    ' : '';
-
-      // Insert new line with proper indentation
-      const newValue =
-        value.substring(0, selectionStart) +
-        '\n' + indentation + extraIndent +
-        value.substring(selectionEnd);
-
-      textarea.value = newValue;
-      const newPosition = selectionStart + 1 + indentation.length + extraIndent.length;
-      textarea.selectionStart = textarea.selectionEnd = newPosition;
-
-      setCode(textarea.value);
-      return;
-    }
-
-    // Handle auto-closing brackets
-    if (AUTO_CLOSE_CHARS.includes(e.key)) {
-      e.preventDefault();
-
-      const closingChar = MATCHING_BRACKETS[e.key];
-      const nextChar = value.charAt(selectionEnd);
-      const hasSelection = selectionStart !== selectionEnd;
-
-      if (hasSelection) {
-        // Wrap selection with brackets
-        const selectedText = value.substring(selectionStart, selectionEnd);
-        const newText = e.key + selectedText + closingChar;
-        const newValue = value.substring(0, selectionStart) + newText + value.substring(selectionEnd);
-
-        textarea.value = newValue;
-        textarea.selectionStart = selectionStart + 1;
-        textarea.selectionEnd = selectionEnd + 1;
-        setCode(textarea.value);
-        return;
-      }
-
-      // Handle regular bracket insertion
-      const before = value.substring(0, selectionStart);
-      const after = value.substring(selectionEnd);
-
-      // Don't auto-close if it would create a double quote
-      if ((e.key === '"' || e.key === "'" || e.key === '`') && nextChar === e.key) {
-        // Just move cursor past the existing quote
-        textarea.selectionStart = textarea.selectionEnd = selectionStart + 1;
-        return;
-      }
-
-      textarea.value = before + e.key + closingChar + after;
-      textarea.selectionStart = textarea.selectionEnd = selectionStart + 1;
-      setCode(textarea.value);
-      return;
-    }
-
-    // Handle backspace to remove pairs
-    if (e.key === 'Backspace' && !e.ctrlKey && !e.metaKey) {
-      const currentChar = value.charAt(selectionStart - 1);
-      const nextChar = value.charAt(selectionStart);
-
-      if (AUTO_CLOSE_CHARS.includes(currentChar) &&
-        nextChar === MATCHING_BRACKETS[currentChar] &&
-        selectionStart === selectionEnd) {
-        e.preventDefault();
-        const newValue = value.substring(0, selectionStart - 1) + value.substring(selectionStart + 1);
-        textarea.value = newValue;
-        textarea.selectionStart = textarea.selectionEnd = selectionStart - 1;
-        setCode(textarea.value);
-        return;
-      }
-    }
-
-
-    // Handle closing bracket/quote skip
-    if (Object.values(MATCHING_BRACKETS).includes(e.key)) {
-      const nextChar = value.charAt(selectionStart);
-      if (nextChar === e.key && selectionStart === selectionEnd) {
-        e.preventDefault();
-        textarea.selectionStart = textarea.selectionEnd = selectionStart + 1;
-        return;
-      }
-    }
-  };
-
   // submissions list to show scores:
   submissions.map((submission) => (
     <div key={submission.id} className="submission-item">
@@ -260,6 +104,24 @@ const CodingLab = () => {
       </div>
     </div>
   ))
+
+  const renderConstraints = () => {
+    if (!problem.constraints || problem.constraints.length === 0) {
+      return null;
+    }
+  
+    return (
+      <>
+        <h3>Constraints</h3>
+        <ul className="constraints-list">
+          {problem.constraints.map((constraint, index) => (
+            <li key={index}>{constraint}</li>
+          ))}
+        </ul>
+      </>
+    );
+  };
+  
 
   const handleSubmit = async () => {
     setIsLoading(true);
@@ -374,6 +236,8 @@ const CodingLab = () => {
                 <h3>Output Format</h3>
                 <p>{problem.outputFormat}</p>
 
+                {renderConstraints()}
+
                 <h3>Example</h3>
                 <pre className="test-case">
                   Input: {problem.example.input} <br></br>
@@ -406,40 +270,40 @@ const CodingLab = () => {
                     </div>
                     <h3>Test Results</h3>
                   </>)}
-                    <div className="test-results">
-                      {results?.results?.map((result, index) => (
-                        <div
-                          key={index}
-                          className={`test-result ${result.passed ? 'passed' : 'failed'}`}
-                        >
-                          <div className="test-result-header">
-                            {result.passed ? (
-                              <CheckCircle className="passed-icon" />
-                            ) : (
-                              <XCircle className="failed-icon" />
-                            )}
-                            <span className="test-case-title">Test Case {result.testCase}</span>
+                <div className="test-results">
+                  {results?.results?.map((result, index) => (
+                    <div
+                      key={index}
+                      className={`test-result ${result.passed ? 'passed' : 'failed'}`}
+                    >
+                      <div className="test-result-header">
+                        {result.passed ? (
+                          <CheckCircle className="passed-icon" />
+                        ) : (
+                          <XCircle className="failed-icon" />
+                        )}
+                        <span className="test-case-title">Test Case {result.testCase}</span>
+                      </div>
+                      <p className="test-case-description">{result.description}</p>
+                      <div className="test-result-details">
+                        <p>Input: {result.input}</p>
+                        <p>Expected: {result.expectedOutput}</p>
+                        {result.error ? (
+                          <div className="test-case-error">
+                            <ErrorDisplay error={result.error} isTestCase={true} />
                           </div>
-                          <p className="test-case-description">{result.description}</p>
-                          <div className="test-result-details">
-                            <p>Input: {result.input}</p>
-                            <p>Expected: {result.expectedOutput}</p>
-                            {result.error ? (
-                              <div className="test-case-error">
-                                <ErrorDisplay error={result.error} isTestCase={true} />
-                              </div>
-                            ) : (
-                              <>
-                                <p>Your Output: {result.yourOutput}</p>
-                                <p className="execution-time">
-                                  Time: {result.executionTime.toFixed(2)}ms
-                                </p>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      ))}
+                        ) : (
+                          <>
+                            <p>Your Output: {result.yourOutput}</p>
+                            <p className="execution-time">
+                              Time: {result.executionTime.toFixed(2)}ms
+                            </p>
+                          </>
+                        )}
+                      </div>
                     </div>
+                  ))}
+                </div>
 
               </div>
             )}
@@ -470,7 +334,7 @@ const CodingLab = () => {
                 ) : (
                   <>
                     <Play />
-                    <span>Submit (Ctrl+Enter)</span>
+                    <span>Submit</span>
                   </>
                 )}
               </button>

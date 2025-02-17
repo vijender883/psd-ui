@@ -317,3 +317,17 @@
   background-color: rgba(255, 0, 0, 0.05);
   border-radius: 4px;
 }
+
+.constraints-list {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 1rem 0;
+}
+
+.constraints-list li {
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  font-family: monospace;
+}
