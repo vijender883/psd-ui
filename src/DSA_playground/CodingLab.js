@@ -296,7 +296,7 @@ const CodingLab = () => {
                           <>
                             <p>Your Output: {result.yourOutput}</p>
                             <p className="execution-time">
-                              Time: {result.executionTime.toFixed(2)}ms
+                              Time: {result.executionTime.toFixed(3)}ms
                             </p>
                           </>
                         )}
@@ -363,7 +363,7 @@ const CodingLab = () => {
                           {submission.passedTests}/{submission.totalTests} tests passed
                         </span>
                         <span className="execution-time">
-                          {submission.executionTime.toFixed(2)}ms
+                          {submission.executionTime.toFixed(3)}ms
                         </span>
                       </div>
                     </div>
