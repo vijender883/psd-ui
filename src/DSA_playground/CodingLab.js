@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Play, Plus, ChevronUp, ChevronDown, CheckCircle, XCircle, X, Eye } from 'lucide-react';
+import { Clock, Play, ChevronUp, ChevronDown, CheckCircle, XCircle, X, Eye } from 'lucide-react';
 import './CodingLab.css';
 import Celebration from './Celebration/Celebration';
 import CalculateScore from './utils/CalculateScore';
@@ -15,10 +15,11 @@ const CodingLab = () => {
   const [customTestCases, setCustomTestCases] = useState([]);
   const [showSubmissions, setShowSubmissions] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [newTestCase, setNewTestCase] = useState({ input: '', expectedOutput: '' });
   const [showResults, setShowResults] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const [compilationError, setCompilationError] = useState(null);
+  const [username, setUsername] = useState('');
+  const [usernameError, setUsernameError] = useState('');
 
   const [problem, setProblem] = useState({
     title: '',
@@ -109,7 +110,7 @@ const CodingLab = () => {
     if (!problem.constraints || problem.constraints.length === 0) {
       return null;
     }
-  
+
     return (
       <>
         <h3>Constraints</h3>
@@ -121,9 +122,15 @@ const CodingLab = () => {
       </>
     );
   };
-  
+
 
   const handleSubmit = async () => {
+    if (!username.trim()) {
+      setUsernameError('Please enter a username');
+      return;
+    }
+    setUsernameError('');
+
     setIsLoading(true);
     setCompilationError(null);
     setShowResults(false);
@@ -136,7 +143,8 @@ const CodingLab = () => {
         },
         body: JSON.stringify({
           code,
-          problemId: problem.id
+          problemId: problem.id,
+          username: username.trim()
         }),
       });
 
@@ -152,7 +160,6 @@ const CodingLab = () => {
         return;
       }
 
-      const score = CalculateScore(data);
       setResults(data);
       setShowResults(true);
 
@@ -160,14 +167,16 @@ const CodingLab = () => {
       const totalTests = data.results.length;
       const passedTests = data.results.filter(result => result.passed).length;
       const averageExecutionTime = data.results.reduce((sum, result) => sum + result.executionTime, 0) / totalTests;
-
+      const score = (passedTests / totalTests) * 100;
+      
       const newSubmission = {
         id: submissions.length + 1,
         timestamp: new Date().toISOString(),
         executionTime: averageExecutionTime,
         passedTests: passedTests,
         totalTests: totalTests,
-        score: score
+        score: score,
+        username: username
       };
 
       setSubmissions([newSubmission, ...submissions]);
@@ -311,6 +320,19 @@ const CodingLab = () => {
 
           {/* Code Editor Panel */}
           <div className="editor-panel">
+            <div className="username-input-container">
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  setUsernameError('');
+                }}
+                placeholder="Enter your username"
+                className={`username-input ${usernameError ? 'error' : ''}`}
+              />
+              {usernameError && <span className="error-message">{usernameError}</span>}
+            </div>
             <div className="code-editor">
               <MonacoCodeEditor
                 value={code}

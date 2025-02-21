@@ -331,3 +331,27 @@
   border-radius: 4px;
   font-family: monospace;
 }
+
+.username-input-container {
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+}
+
+.username-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.username-input.error {
+  border-color: #dc3545;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+}
