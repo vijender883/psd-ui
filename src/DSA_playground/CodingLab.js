@@ -242,7 +242,7 @@ const CodingLab = () => {
               <h2>{problem.title}</h2>
               <div className="problem-description">
                 <h3>Problem Description</h3>
-                <p>{problem.description}</p>
+                <p dangerouslySetInnerHTML={{ __html: problem.description }}></p>
 
                 <h3>Input Format</h3>
                 <p>{problem.inputFormat}</p>
@@ -260,7 +260,7 @@ const CodingLab = () => {
 
               </div>
 
-              {renderSolutionSection()}
+              {/* {renderSolutionSection()} */}
             </div>
 
             {/* Results Overlay */}
