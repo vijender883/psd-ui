@@ -2,10 +2,10 @@ import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import './ProblemNavigation.css';
 
-const ProblemNavigation = ({ 
-  currentProblem, 
-  problems, 
-  onSelectProblem 
+const ProblemNavigation = ({
+  currentProblem,
+  problems,
+  onSelectProblem
 }) => {
   const currentIndex = problems.findIndex(p => p.id === currentProblem.id);
   const hasPrevious = currentIndex > 0;
@@ -24,12 +24,12 @@ const ProblemNavigation = ({
             >
               <ChevronLeft size={20} />
             </button>
-            
+
             <div className="problem-selector">
               <select
                 value={currentProblem.id}
                 onChange={(e) => {
-                  const problem = problems.find(p => p.id === parseInt(e.target.value));
+                  const problem = problems.find(p => p.id === e.target.value); // Remove parseInt
                   onSelectProblem(problem);
                 }}
                 className="problem-select"
@@ -50,7 +50,7 @@ const ProblemNavigation = ({
               <ChevronRight size={20} />
             </button>
           </div>
-          
+
           {/* Problem Stats */}
           <div className="problem-stats">
             <div className="difficulty-indicator">

@@ -212,6 +212,11 @@ const CodingLab = () => {
 
 
   const handleProblemSelect = (selectedProblem) => {
+    console.log('Selected Problem:', selectedProblem); // Add this
+    if (!selectedProblem) {
+      console.error('Selected problem is undefined');
+      return;
+    }
     setProblem(selectedProblem);
     setCode(selectedProblem.functionTemplate);
     // Reset states for new problem
