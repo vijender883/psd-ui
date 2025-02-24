@@ -37,12 +37,12 @@ const SuspiciousWarning = ({
               <div className="complexity-row">
                 <span className="complexity-label">Time Complexity:</span>
                 <span className="complexity-provided">Provided: {providedTimeComplexity}</span>
-                <span className="complexity-actual">Actual: {actualTimeComplexity}</span>
+                <span className="complexity-actual">Ideal: {actualTimeComplexity}</span>
               </div>
               <div className="complexity-row">
                 <span className="complexity-label">Space Complexity:</span>
                 <span className="complexity-provided">Provided: {providedSpaceComplexity}</span>
-                <span className="complexity-actual">Actual: {actualSpaceComplexity}</span>
+                <span className="complexity-actual">Ideal: {actualSpaceComplexity}</span>
               </div>
             </div>
             {/* <p className="complexity-explanation">{complexityExplanation}</p> */}
