@@ -9,6 +9,22 @@ const MonacoCodeEditor = ({
   onSubmit 
 }) => {
   const handleEditorDidMount = (editor, monaco) => {
+    // Disable copy paste commands
+    // editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyC, () => {
+    //   // Prevent copy
+    //   return null;
+    // });
+    
+    // editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyV, () => {
+    //   // Prevent paste
+    //   return null;
+    // });
+    
+    // editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyX, () => {
+    //   // Prevent cut
+    //   return null;
+    // });
+
     // Configure editor settings
     editor.updateOptions({
       fontSize: 14,
@@ -24,7 +40,8 @@ const MonacoCodeEditor = ({
       formatOnPaste: true,
       formatOnType: true,
       scrollBeyondLastLine: false,
-      automaticLayout: true
+      automaticLayout: true,
+      contextmenu: false  // Disable context menu to prevent right-click copy/paste
     });
 
     // Add Ctrl/Cmd + Enter shortcut
@@ -36,6 +53,17 @@ const MonacoCodeEditor = ({
         }
       }
     );
+
+    // Override the default copy/paste/cut handlers
+    // editor.onKeyDown((e) => {
+    //   if (
+    //     (e.ctrlKey || e.metaKey) && 
+    //     (e.code === 'KeyC' || e.code === 'KeyV' || e.code === 'KeyX')
+    //   ) {
+    //     e.preventDefault();
+    //     e.stopPropagation();
+    //   }
+    // });
   };
 
   return (

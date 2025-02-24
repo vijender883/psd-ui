@@ -20,6 +20,21 @@ const CodingLab = () => {
   const [compilationError, setCompilationError] = useState(null);
   const [username, setUsername] = useState('');
   const [usernameError, setUsernameError] = useState('');
+  const [isRunMode, setIsRunMode] = useState(false);
+  const [timeComplexity, setTimeComplexity] = useState('');
+  const [spaceComplexity, setSpaceComplexity] = useState('');
+  const [complexityError, setComplexityError] = useState('');
+
+  const complexityOptions = [
+    'O(1)',
+    'O(log n)',
+    'O(n)',
+    'O(n log n)',
+    'O(n²)',
+    'O(n³)',
+    'O(2ⁿ)',
+    'O(n!)'
+  ];
 
   const [problem, setProblem] = useState({
     title: '',
@@ -29,6 +44,49 @@ const CodingLab = () => {
     example: { input: '', output: '' },
     functionTemplate: ''
   });
+
+  const handleRun = async () => {
+    setIsLoading(true);
+    setCompilationError(null);
+    setShowResults(false);
+    setIsRunMode(true);
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/code/run`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          code,
+          problemId: problem.id
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        setCompilationError(data.error);
+        setResults({
+          results: [],
+          error: data.error
+        });
+        setShowResults(true);
+        return;
+      }
+
+      setResults(data);
+      setShowResults(true);
+    } catch (error) {
+      setShowResults(true);
+      setCompilationError({
+        message: 'An error occurred while running your code',
+        stack: error.message
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const [problems, setProblems] = useState([]);
   const [showingSolution, setShowingSolution] = useState(false);
@@ -123,28 +181,52 @@ const CodingLab = () => {
     );
   };
 
+  const validateSubmission = () => {
+    let isValid = true;
 
-  const handleSubmit = async () => {
     if (!username.trim()) {
       setUsernameError('Please enter a username');
+      isValid = false;
+    }
+
+    if (!timeComplexity) {
+      setComplexityError('Please select time complexity');
+      isValid = false;
+    }
+
+    if (!spaceComplexity) {
+      setComplexityError('Please select space complexity');
+      isValid = false;
+    }
+
+    return isValid;
+  };
+
+  const handleSubmit = async () => {
+    setUsernameError('');
+    setComplexityError('');
+
+    if (!validateSubmission()) {
       return;
     }
-    setUsernameError('');
 
+    setIsRunMode(false);
     setIsLoading(true);
     setCompilationError(null);
     setShowResults(false);
+
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/code/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         },
         body: JSON.stringify({
           code,
           problemId: problem.id,
-          username: username.trim()
+          username: username.trim(),
+          timeComplexity,
+          spaceComplexity
         }),
       });
 
@@ -163,12 +245,12 @@ const CodingLab = () => {
       setResults(data);
       setShowResults(true);
 
-      // Calculate summary from results array
+      // Calculate summary and update submissions only for submit action
       const totalTests = data.results.length;
       const passedTests = data.results.filter(result => result.passed).length;
       const averageExecutionTime = data.results.reduce((sum, result) => sum + result.executionTime, 0) / totalTests;
       const score = (passedTests / totalTests) * 100;
-      
+
       const newSubmission = {
         id: submissions.length + 1,
         timestamp: new Date().toISOString(),
@@ -176,11 +258,12 @@ const CodingLab = () => {
         passedTests: passedTests,
         totalTests: totalTests,
         score: score,
-        username: username
+        username: username,
+        timeComplexity,
+        spaceComplexity
       };
 
       setSubmissions([newSubmission, ...submissions]);
-
       if (score === 100) {
         setShowCelebration(true);
         setTimeout(() => setShowCelebration(false), 3000);
@@ -191,9 +274,7 @@ const CodingLab = () => {
         message: 'An error occurred while running your code',
         stack: error.message
       });
-      console.error('Error submitting code:', error);
-    }
-    finally {
+    } finally {
       setIsLoading(false);
     }
   };
@@ -325,19 +406,57 @@ const CodingLab = () => {
 
           {/* Code Editor Panel */}
           <div className="editor-panel">
-            <div className="username-input-container">
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => {
-                  setUsername(e.target.value);
-                  setUsernameError('');
-                }}
-                placeholder="Enter your username"
-                className={`username-input ${usernameError ? 'error' : ''}`}
-              />
-              {usernameError && <span className="error-message">{usernameError}</span>}
+            <div className="submission-details">
+              <div className="username-input-container">
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => {
+                    setUsername(e.target.value);
+                    setUsernameError('');
+                  }}
+                  placeholder="Enter your username"
+                  className={`username-input ${usernameError ? 'error' : ''}`}
+                />
+                {usernameError && <span className="error-message">{usernameError}</span>}
+              </div>
+
+              <div className="complexity-selectors">
+                <div className="complexity-select">
+                  <select
+                    value={timeComplexity}
+                    onChange={(e) => setTimeComplexity(e.target.value)}
+                    className="select-input"
+                  >
+                    <option value="">Select Time Complexity</option>
+                    {complexityOptions.map((complexity) => (
+                      <option key={complexity} value={complexity}>
+                        {complexity}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="complexity-select">
+                  <select
+                    value={spaceComplexity}
+                    onChange={(e) => setSpaceComplexity(e.target.value)}
+                    className="select-input"
+                  >
+                    <option value="">Select Space Complexity</option>
+                    {complexityOptions.map((complexity) => (
+                      <option key={complexity} value={complexity}>
+                        {complexity}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              {complexityError && (
+                <span className="error-message">{complexityError}</span>
+              )}
             </div>
+
             <div className="code-editor">
               <MonacoCodeEditor
                 value={code}
@@ -347,56 +466,42 @@ const CodingLab = () => {
               />
             </div>
 
-            <div className="submit-button-container">
+            <div className="button-container">
               <button
-                onClick={handleSubmit}
+                onClick={handleRun}
                 disabled={isLoading}
-                className="submit-button"
+                className="button button-outline"
               >
-                {isLoading ? (
+                {isLoading && isRunMode ? (
                   <>
-                    <Clock className="animate-spin" />
+                    <span className="icon icon-spin">⏰</span>
                     <span>Running...</span>
                   </>
                 ) : (
                   <>
-                    <Play />
+                    <span className="icon">▶️</span>
+                    <span>Run</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                onClick={handleSubmit}
+                disabled={isLoading}
+                className="button button-primary"
+              >
+                {isLoading && !isRunMode ? (
+                  <>
+                    <span className="icon icon-spin">⏰</span>
+                    <span>Submitting...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="icon">▶️</span>
                     <span>Submit</span>
                   </>
                 )}
               </button>
-            </div>
-
-            <div className="submissions-panel">
-              <button
-                onClick={() => setShowSubmissions(!showSubmissions)}
-                className="submissions-toggle"
-              >
-                <span>Previous Submissions</span>
-                {showSubmissions ? <ChevronDown /> : <ChevronUp />}
-              </button>
-              {showSubmissions && (
-                <div className="submissions-list">
-                  {submissions.map((submission) => (
-                    <div key={submission.id} className="submission-item">
-                      <div className="submission-header">
-                        <span className="submission-id">#{submission.id}</span>
-                        <span className="submission-time">
-                          {new Date(submission.timestamp).toLocaleString()}
-                        </span>
-                      </div>
-                      <div className="submission-info">
-                        <span className="test-stats">
-                          {submission.passedTests}/{submission.totalTests} tests passed
-                        </span>
-                        <span className="execution-time">
-                          {submission.executionTime.toFixed(3)}ms
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
         </div>

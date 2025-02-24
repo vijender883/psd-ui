@@ -28,6 +28,119 @@
   overflow-y: auto;
 }
 
+.submission-details {
+  margin-bottom: 20px;
+}
+
+.username-input-container {
+  margin-bottom: 16px;
+}
+
+.username-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.username-input.error {
+  border-color: #dc3545;
+}
+
+.complexity-selectors {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.complexity-select {
+  width: 50%;
+}
+
+.select-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+  font-size: 14px;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+}
+
+.code-editor {
+  margin-bottom: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.button-container {
+  display: flex;
+  gap: 16px;
+}
+
+.button {
+  flex: 1;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.button-outline {
+  background-color: transparent;
+  border: 1px solid #007bff;
+  color: #007bff;
+}
+
+.button-outline:hover:not(:disabled) {
+  background-color: rgba(0, 123, 255, 0.1);
+}
+
+.button-primary {
+  background-color: #007bff;
+  border: 1px solid #007bff;
+  color: #fff;
+}
+
+.button-primary:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.icon {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+.icon-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .editor-panel {
   width: 50%;
   display: flex;
@@ -330,23 +443,6 @@
   background-color: #f8f9fa;
   border-radius: 4px;
   font-family: monospace;
-}
-
-.username-input-container {
-  margin-bottom: 1rem;
-  padding: 0.5rem;
-}
-
-.username-input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-.username-input.error {
-  border-color: #dc3545;
 }
 
 .error-message {
