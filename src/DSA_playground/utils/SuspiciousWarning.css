@@ -1,0 +1,81 @@
+.suspicious-warning {
+  margin: 1rem 0;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.warning-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 1rem;
+  background-color: #fff3e0;
+  border: 1px solid #ffb74d;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.complexity-warning {
+  display: flex;
+  align-items: flex-start;
+  padding: 1rem;
+  background-color: #ffebee;
+  border: 1px solid #ef5350;
+  border-radius: 4px;
+}
+
+.warning-icon {
+  margin-right: 0.75rem;
+  margin-top: 0.25rem;
+  flex-shrink: 0;
+}
+
+.warning-content {
+  flex: 1;
+}
+
+.warning-content h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.warning-content p {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #333;
+}
+
+.complexity-comparison {
+  margin: 0.5rem 0;
+  font-family: monospace;
+  background: #f8f9fa;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.complexity-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.complexity-label {
+  font-weight: 600;
+  min-width: 120px;
+}
+
+.complexity-provided {
+  color: #dc3545;
+  min-width: 100px;
+}
+
+.complexity-actual {
+  color: #198754;
+  min-width: 100px;
+}
+
+.complexity-explanation {
+  margin-top: 0.5rem;
+  font-style: italic;
+  color: #6c757d;
+}

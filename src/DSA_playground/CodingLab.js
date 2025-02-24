@@ -6,6 +6,7 @@ import CalculateScore from './utils/CalculateScore';
 import ProblemNavigation from './ProblemNav/ProblemNavigation';
 import MonacoCodeEditor from './CodeEditor/MonacoCodeEditor';
 import ErrorDisplay from './ErrorDisplay/ErrorDisplay';
+import SuspiciousWarning from './utils/SuspiciousWarning';
 
 
 const CodingLab = () => {
@@ -360,9 +361,28 @@ const CodingLab = () => {
                   </div>
                 ) : (
                   <>
-                    <div className="score-display">
-                      Score: {CalculateScore(results)}/100
-                    </div>
+                    {!isRunMode && (
+                      <>
+                        <div className="score-display">
+                          Score: {CalculateScore(results)}/100
+                        </div>
+                        {results?.analysis && (
+                          <SuspiciousWarning
+                            isSuspicious={results.analysis.isSuspicious}
+                            suspicionReason={results.analysis.reasons?.[0]}
+                            isComplexityAccurate={
+                              results.analysis.isTimeComplexityAccurate &&
+                              results.analysis.isSpaceComplexityAccurate
+                            }
+                            providedTimeComplexity={timeComplexity}
+                            providedSpaceComplexity={spaceComplexity}
+                            actualTimeComplexity={results.analysis.actualTimeComplexity}
+                            actualSpaceComplexity={results.analysis.actualSpaceComplexity}
+                            complexityExplanation={results.analysis.explanation}
+                          />
+                        )}
+                      </>
+                    )}
                     <h3>Test Results</h3>
                   </>)}
                 <div className="test-results">
@@ -397,6 +417,7 @@ const CodingLab = () => {
                         )}
                       </div>
                     </div>
+
                   ))}
                 </div>
 
