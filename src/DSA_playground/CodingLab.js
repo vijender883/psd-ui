@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Clock, Play, ChevronUp, ChevronDown, CheckCircle, XCircle, X, Eye } from 'lucide-react';
 import './CodingLab.css';
 import Celebration from './Celebration/Celebration';
-import CalculateScore from './utils/CalculateScore';
 import ProblemNavigation from './ProblemNav/ProblemNavigation';
 import MonacoCodeEditor from './CodeEditor/MonacoCodeEditor';
 import ErrorDisplay from './ErrorDisplay/ErrorDisplay';
@@ -26,6 +25,7 @@ const CodingLab = () => {
   const [spaceComplexity, setSpaceComplexity] = useState('');
   const [complexityError, setComplexityError] = useState('');
   const [showLLMPopup, setShowLLMPopup] = useState(false);
+  const [currentScore, setCurrentScore] = useState(0);
 
   const complexityOptions = [
     'O(1)',
@@ -268,6 +268,8 @@ const CodingLab = () => {
     const passedTests = result.results.filter(result => result.passed).length;
     const score = (passedTests / totalTests) * 100;
 
+    setCurrentScore(score);
+
     const newSubmission = {
       id: submissions.length + 1,
       timestamp: new Date().toISOString(),
@@ -314,6 +316,7 @@ const CodingLab = () => {
     setCustomTestCases([]);
     setShowResults(false);
     setCompilationError(null);
+    setCurrentScore(0);
   };
 
   return (
@@ -404,7 +407,7 @@ const CodingLab = () => {
                     {!isRunMode && (
                       <>
                         <div className="score-display">
-                          Score: {CalculateScore(results)}/100
+                          Score: {currentScore.toFixed(0)}
                         </div>
                         {results?.analysis && (
                           <SuspiciousWarning
